@@ -19,14 +19,41 @@ class TestPQ2(unittest.TestCase):
         # Expected value is index positions
         self.assertEqual(result, [0, 3, 0])
 
+    def test_select_pivot_median_odd_length_list(self):
+        """
+        Test that select_pivot will select the correct median using the "median 
+        of three" technique in an odd length list. Even length tested in 
+        test_select_pivot.
+        """
+
+        test_list = [8, 2, 4, 5, 7]
+
+        result = pq.select_pivot(test_list, 0, len(test_list)-1, "median")
+
+        # Expected value is the index position of the pivot selected
+        self.assertEqual(result, 4)
+
+    def test_select_pivot_median_short_length_list(self):
+        """
+        Test that select_pivot will select the correct median using the "median
+        of three" technique in a list of length two.
+        """
+
+        test_list = [1, 2]
+
+        result = pq.select_pivot(test_list, 0, len(test_list)-1, "median")
+
+        # Expected value is the index position of the pivot selected
+        self.assertEqual(result, 0)
+
     def test_selection_sort(self):
         """
         Test the implementation of selection sort.
         """
 
-        unsorted_list = [2, 3, 1, 4]
+        unsorted_list = [2, 3, 1, 1, 4, 4]
         result = pq.selection_sort(unsorted_list)
-        self.assertEqual(result, [1, 2, 3, 4])
+        self.assertEqual(result, [1, 1, 2, 3, 4, 4])
 
     def test_setup(self):
         """
@@ -65,12 +92,39 @@ class TestPQ2(unittest.TestCase):
         the pivot.
         """
 
-        test_list = [3, 1, 2]
+        test_list = [2, 0, 1, 4, 3]
 
-        _, result = pq.quicksort(test_list, 0, len(test_list)-1, 0,
+        _, result = pq.quicksort(test_list, 0, len(test_list)-1,
         pivot_method="first")
 
-        self.assertEqual(result, 3)
+        self.assertEqual(result, 6)
+
+    def test_quicksort_comparisons_last(self):
+        """
+        Ensure quicksort returns the correct number of comparisons when
+        the pivot selection method only selects the last element as
+        the pivot.
+        """
+        test_list = [8, 5, 0, 1]
+
+        _, result = pq.quicksort(test_list, 0, len(test_list)-1, 
+        pivot_method="last")
+
+        self.assertEqual(result, 4)
+
+    def test_quicksort_comparisons_median(self):
+        """
+        Ensure quicksort returns the correct number of comparisons when
+        the pivot selection method uses the median of three to select
+        the pivot element.
+        """
+
+        test_list = [8, 2, 4, 5, 7, 1]
+
+        _, result = pq.quicksort(test_list, 0, len(test_list)-1, 
+        pivot_method="median")
+
+        self.assertEqual(result, 8)
 
 if __name__ == "__main__":
     unittest.main()
