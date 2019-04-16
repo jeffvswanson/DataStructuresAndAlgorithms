@@ -68,34 +68,29 @@ def main():
     print("Setting up")
     initial_list = setup()
 
-    # Copy the lists to prevent Python from referencing the memory 
-    # locations
-    question_list = initial_list.copy()
+
+    
 
     # Set up list to aggregate number of comparisons used per pivot
     # selection method
     comparisons_list = [0, 0, 0]
-    print("Calculating first item pivot method.")
-    comparisons_list[0] = quicksort(question_list, 0, len(question_list)-1, 
-    comparisons_list[0], pivot_method="first")
-    print("Calculating last item pivot method.")
-    question_list = initial_list.copy()
-    comparisons_list[1] = quicksort(question_list, 0, len(question_list)-1, 
-    comparisons_list[1], pivot_method="last")
-    print("Calculating median of three pivot method.")
-    question_list = initial_list.copy()
-    comparisons_list[2] = quicksort(initial_list, 0, len(question_list)-1, 
-    comparisons_list[2], pivot_method="median")
+    pivot_method_list = ["first", "last", "median"]
+
+    for i, pivot_method in enumerate(pivot_method_list):
+        print("Using {} pivot method to calculate comparisons".
+        format(pivot_method))
+
+        # Copy the lists to prevent Python from referencing the memory 
+        # locations
+        question_list = initial_list.copy()
+        _, comparisons_list[i] = quicksort(question_list, 0, 
+        len(question_list)-1, pivot_method=pivot_method)
+
     print("Calculations complete.")
 
-    print("There are {} comparisons using the first element as the pivot " 
-        "element.".format(comparisons_list[0]))
-
-    print("There are {} comparisons using the last element as the pivot "
-        "element.".format(comparisons_list[1]))
-
-    print("There are {} comparisons using the median method to determine the "
-        "pivot element.".format(comparisons_list[2]))
+    for i, pivot_method in enumerate(pivot_method_list):
+        print("There are {} comparisons using the {} element as the pivot "
+        "element.".format(comparisons_list[i], pivot_method_list[i]))
 
 def setup():
     """Function to import data from the given .txt file"""
@@ -111,12 +106,13 @@ def setup():
 
     return generated_list
 
-def quicksort(target_list, left_index, right_index, comparisons, pivot_method="random"):
+def quicksort(target_list, left_index, right_index, pivot_method="random"):
     """Quicksort algorithm, assumes all elements are distinct."""
 
+    # bounded_list_length = m - 1
+    bounded_list_length = right_index - left_index
     # Base case: A difference of 1 or 0 between the left and right
     # indices means the element is sorted and no comparisons are made.
-    bounded_list_length = right_index - left_index
     if bounded_list_length < 1:
         return target_list, 0
 
@@ -142,37 +138,39 @@ def quicksort(target_list, left_index, right_index, comparisons, pivot_method="r
         j += 1
 
     # Swap the pivot element into its rightful position
-    target_list = swap(target_list, i-1, left_index)
+    target_list = swap(target_list, left_index, i-1)
 
-    # Accumulate the number of comparisons
-    comparisons = bounded_list_length - 1
+    comparisons = bounded_list_length
 
     # Sort the elements less than the pivot
-    target_list, low_comparisons = quicksort(target_list, left_index, i-2, comparisons, pivot_method)
+    target_list, low_comparisons = quicksort(target_list, left_index, i-2, 
+    pivot_method)
     # Sort the elements greater than the pivot
-    target_list, high_comparisons = quicksort(target_list, i, len(target_list)-1, comparisons, pivot_method)
+    target_list, high_comparisons = quicksort(target_list, i, 
+    j-1, pivot_method)
 
+    # Accumulate the number of comparisons
     comparisons += low_comparisons + high_comparisons
 
     return target_list, comparisons
 
-def select_pivot(target_list, left_index, right_index, index_choice):
+def select_pivot(target_list, left_index, right_index, indexing_choice):
     """Selects which quicksort pivot method to use."""
 
-    if index_choice == "first":
+    if indexing_choice == "first":
         # pivot_index = leftmost index position
         pivot_index = left_index
-    elif index_choice == "last":
+    elif indexing_choice == "last":
         # pivot_index = rightmost index position
         pivot_index = right_index
-    elif index_choice == "median":
+    elif indexing_choice == "median":
         # pivot_index = "median of three"        
         first_element = target_list[left_index]
         last_element = target_list[right_index]
 
         # Determine the median value of the bounded list
         bounded_list_length = right_index - left_index
-        median_index = bounded_list_length//2
+        median_index = bounded_list_length//2 + left_index
         median_element = target_list[median_index]
 
         potential_median_list = [first_element, median_element, last_element]
