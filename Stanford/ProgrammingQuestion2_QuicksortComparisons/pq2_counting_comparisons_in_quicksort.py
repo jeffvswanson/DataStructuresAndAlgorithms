@@ -68,9 +68,6 @@ def main():
     print("Setting up")
     initial_list = setup()
 
-
-    
-
     # Set up list to aggregate number of comparisons used per pivot
     # selection method
     comparisons_list = [0, 0, 0]
@@ -107,7 +104,7 @@ def setup():
     return generated_list
 
 def quicksort(target_list, left_index, right_index, pivot_method="random"):
-    """Quicksort algorithm, assumes all elements are distinct."""
+    """Quicksort algorithm"""
 
     # bounded_list_length = m - 1
     bounded_list_length = right_index - left_index
@@ -132,7 +129,7 @@ def quicksort(target_list, left_index, right_index, pivot_method="random"):
     i = j = left_index + 1 # The pivot element is in the first position
 
     while j <= right_index:
-        if target_list[j] < pivot_value:
+        if target_list[j] <= pivot_value:
             target_list = swap(target_list, i, j)
             i += 1
         j += 1

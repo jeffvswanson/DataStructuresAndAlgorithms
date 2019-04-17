@@ -126,5 +126,16 @@ class TestPQ2(unittest.TestCase):
 
         self.assertEqual(result, 8)
 
+    def test_quicksort_repeated_values(self):
+        """
+        Ensure quicksort can handle repeated values in the list.
+        """
+
+        test_list = [9, 4, 6, 1, 3, 7, 5, 2, 8, 0, 8]
+        sorted_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 9]
+
+        test_list, _ = pq.quicksort(test_list, 0, len(test_list)-1)
+        self.assertEqual(test_list, sorted_list)
+
 if __name__ == "__main__":
     unittest.main()
