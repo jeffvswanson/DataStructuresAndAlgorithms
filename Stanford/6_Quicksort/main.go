@@ -45,7 +45,7 @@ func quicksort(xint []int, leftIndex, rightIndex int) []int {
 	j := i
 
 	for j <= rightIndex {
-		if xint[j] < pivot {
+		if xint[j] <= pivot {
 			xint = swap(xint, i, j)
 			i++
 		}

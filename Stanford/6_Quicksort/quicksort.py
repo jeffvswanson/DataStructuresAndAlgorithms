@@ -33,7 +33,7 @@ def quicksort(input_list, left_index, right_index):
     i = j = left_index + 1 # The pivot element is in the first position
 
     while j <= right_index:
-        if input_list[j] < pivot:
+        if input_list[j] <= pivot:
             input_list = swap(input_list, i, j)
             i += 1
         j += 1
