@@ -23,27 +23,20 @@ to run the algorithm many times with different random seeds, and
 remember the smallest cut that you ever find.)
 """
 
+import copy
 import math
 import numpy as np
-import random
+import sys
+
 from collections import defaultdict
 
 def main():
     print("Setting the problem up.")
-    vertices, edges, edge_endpoints, node_edges = setup()
+    vertices, node_edges = setup()
 
-    # To ensure we get the correct answer we have to run a 
-    # statistically significant number of tests.
-    num_runs = len(vertices) * int(math.log2(len(vertices)))
+    num_cuts = find_min_cuts(vertices, node_edges)
 
-    # Choose an arbitrarily high number to compare against
-    min_cuts = np.Infinity
-    for i in range(num_runs):
-        num_cuts = find_min_cut(vertices, edges, node_edges)
-        if num_cuts < min_cuts:
-            min_cuts = num_cuts
-
-    print("The minimum number of cuts is {}".format(min_cuts))
+    print("The minimum number of cuts is {}".format(num_cuts))
 
 def setup():
     """
@@ -51,7 +44,6 @@ def setup():
     """
 
     vertices = []
-    edges = []
     node_edges = defaultdict(list)
 
     with open("kargerMinCut.txt") as f:
@@ -72,51 +64,64 @@ def setup():
                 v = int(v)
                 # We don't want self-loops, that is, (1, 1).
                 if v != vertex:
-                    edge = (vertex, v)
-                    edges.append(edge)
                     node_edges[vertex].append(v)
 
-    edge_endpoints = 1
+    return vertices, node_edges
 
-    return vertices, edges, edge_endpoints, node_edges
+def find_min_cuts(vertices, node_edges):
+    """Function to notify user status of the min-cut search."""
 
-def find_min_cut(vertices, edges, node_edges):
+    # This function runs very slowly, but should be able to be sped
+    # up by focusing on the karger_algorithm. Slow down may be due to
+    # the copy of the vertices and node_edges instead of using 
+    # pointers.
+
+    # To ensure we get the correct answer we have to run a 
+    # statistically significant number of tests.
+    num_runs = int(math.pow(len(vertices),2)) * int(math.log2(len(vertices)))
+
+    # Choose an arbitrarily high number to compare against
+    min_cuts = np.Infinity
+    for i in range(num_runs):
+        print("Iteration {} of {}.".format(i, num_runs))
+        node_edges_copy = copy.deepcopy(node_edges)
+        vertices_copy = vertices.copy()
+        num_cuts = karger_algorithm(vertices_copy, node_edges_copy)
+        if num_cuts < min_cuts:
+            min_cuts = num_cuts
+        print("min_cuts = {}, num_cuts = {}\n".format(min_cuts, num_cuts))
+        sys.stdout.flush()
+
+    return min_cuts
+
+def karger_algorithm(vertices, node_edges):
     """Karger random contraction algorithm."""
 
-    len_vertices = len(vertices)
-    while len_vertices > 2:
+    while len(vertices) > 2:
         # Select an edge (u, v) uniformly at random to remove.
-        edge_index = random.randint(0, len_vertices-1)
-        u, v = edges[edge_index]
-        print("u =", u)
-        print("v =", v)
+        u = np.random.choice(vertices)
+        v = np.random.choice(node_edges[u])
+        
+        # Merge the two nodes u and v associated with the edge (u, v) 
+        # into a single vertex.
+        node_edges[u] += node_edges[v]
+        del node_edges[v]
 
-        # Slice out the selected index so it cannot be selected again
-        # from edges
-        if edge_index+1 < len(edges):
-            edges = edges[:edge_index] + edges[edge_index+1:]
-        else:
-            edges = edges[:-1]
-
-        # Going to have to implement a method to merge edges and remove edges referencing the merged node.
-
-        # Merge the two nodes associated with the edge into a single
-        # vertex.
-        node_edges[u].append(node_edges.pop(v))
         # Remove references to the merged node, v, within u, as well as
         # self-loops.
-        for value in node_edges[u]:
-            if value == v or value == u:
-                node_edges[u].remove(value)
-        # Replace all values of the merged node, v, with u.
+        while u in node_edges[u]:
+            node_edges[u].remove(u)
+        while v in node_edges[u]:
+            node_edges[u].remove(v)
+        # Replace all edges with values of the merged node, v, with u.
         for k, values_list in node_edges.items():
-            for value in values_list:
-                if value == v:
-                    value = u
+            while v in values_list:
+                node_edges[k].append(u)
+                node_edges[k].remove(v)
 
         vertices.remove(v)
-
-    return len(node_edges.values()[0])
+    
+    return len(next(iter(node_edges.values())))
 
 if __name__ == "__main__":
     main()

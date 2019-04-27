@@ -14,22 +14,11 @@ class TestPQ3(unittest.TestCase):
         result = pq.setup()
 
         vertices = result[0]
-        edges = result[1]
-        edge_endpoints = result[2]
-        node_edges = result[3]
+        node_edges = result[1]
 
         # 200 is the last vertex value
         self.assertEqual(vertices[-1], 200, 
         "The vertices list has not imported correctly.")
-
-        # (200, 35) is the last edge value
-        self.assertEqual(edges[-1], (200, 35), 
-        "The edges list has not imported correctly.")
-
-        # Check that there are no self-loops
-        for i in vertices:
-            self.assertNotIn(edges, (i, i), 
-        "The edges list has self-loops. Remove the self-loops.")
 
         # Check that the one-to-many relationship of a vertex to other
         # vertices is hashed correctly. Using node 200.
@@ -38,21 +27,70 @@ class TestPQ3(unittest.TestCase):
         self.assertEqual(node_edges[200], expected)
 
 
-    def test_min_cut(self):
+    def test_find_min_cuts(self):
         """
         Test to ensure min cut returns correct value.
         """
         
         vertices = [1, 2, 3, 4]
-        edges = [(1, 2), (1, 3), (2, 1), (2, 3), (2, 4), (3, 1), (3, 2), 
-        (3, 4), (4, 2), (4, 3)]
         node_edges = defaultdict(list)
-        node_edges = {1: [2, 3], 2: [1, 3, 4], 3: [1, 2, 4], 4: [2, 3]}
+        node_edges = {
+            1: [2, 3], 
+            2: [1, 3, 4], 
+            3: [1, 2, 4], 
+            4: [2, 3]
+            }
 
         expected = 2
-        got = pq.find_min_cut(vertices, edges, node_edges)
+        got = pq.find_min_cuts(vertices, node_edges)
 
-        self.assertEqual(expected, got, "Min cut is not correct.")
+        self.assertEqual(expected, got, 
+        "Min cut is not correct on length {} test".format(len(vertices)))
+
+        vertices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        node_edges = {
+            1: [2, 3, 4, 5],
+            2: [1, 3, 4, 5],
+            3: [1, 2, 4, 5, 6],
+            4: [1, 2, 3, 5, 7],
+            5: [1, 2, 3, 4],
+            6: [7, 8, 9, 10, 3],
+            7: [6, 8, 9, 10, 4],
+            8: [6, 7, 9, 10],
+            9: [6, 7, 8, 10],
+            10: [6, 7, 8, 9]
+        }
+
+        expected = 2
+        got = pq.find_min_cuts(vertices, node_edges)
+
+        self.assertEqual(expected, got, 
+        "Min cut is not correct on length {} test".format(len(vertices)))
+
+        vertices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        node_edges = {
+            1: [2, 3, 4, 5],
+            2: [1, 3, 4, 5],
+            3: [1, 2, 4, 5, 6],
+            4: [1, 2, 3, 5, 7, 14],
+            5: [1, 2, 3, 4],
+            6: [7, 8, 9, 10, 3],
+            7: [6, 8, 9, 10, 4],
+            8: [6, 7, 9, 10],
+            9: [6, 7, 8, 10],
+            10: [6, 7, 8, 9],
+            11: [12, 13, 14, 15],
+            12: [11, 13, 14, 15],
+            13: [12, 11, 14, 15],
+            14: [12, 13, 11, 15, 4],
+            15: [12, 13, 14, 11]
+        }
+
+        expected = 1
+        got = pq.find_min_cuts(vertices, node_edges)
+
+        self.assertEqual(expected, got, 
+        "Min cut is not correct on length {} test".format(len(vertices)))
 
 if __name__ == "__main__":
     unittest.main()
