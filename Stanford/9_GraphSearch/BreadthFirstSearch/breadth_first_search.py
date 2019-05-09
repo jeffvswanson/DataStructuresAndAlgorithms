@@ -86,12 +86,12 @@ def breadth_first_search(starting_node, ending_node, vertices, node_edges):
         return 0
 
     # Set all nodes as unexplored
-    isExplored = defaultdict(str)
+    is_explored = defaultdict(str)
     for vertex in vertices:
-        isExplored[vertex] = "Unexplored"
+        is_explored[vertex] = "Unexplored"
 
     # Set starting_node as "Explored"
-    isExplored[starting_node] = "Explored"
+    is_explored[starting_node] = "Explored"
 
     # Let Q = queue data structure (First-in, First-out (FIFO)), 
     # initialized with starting_node
@@ -106,12 +106,12 @@ def breadth_first_search(starting_node, ending_node, vertices, node_edges):
         v = q.pop(0)
         # Explore the different edges v posseses (v, u)
         for u in node_edges[v]:
-            if isExplored[u] == "Unexplored":
+            if is_explored[u] == "Unexplored":
                 distance_from_start_node[u] = distance_from_start_node[v] + 1
-                isExplored[u] = "Explored"
+                is_explored[u] = "Explored"
                 q.append(u)
 
-    if isExplored[ending_node] == "Explored":
+    if is_explored[ending_node] == "Explored":
         shortest_path = distance_from_start_node[ending_node]
     else:
         # The two nodes are not connected.

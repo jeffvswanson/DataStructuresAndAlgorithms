@@ -48,10 +48,12 @@ class TestBFS(unittest.TestCase):
 
         got = []
         for i in range(len(expected)):
-            got.append(bfs.breadth_first_search(starting_node, ending_node[i], vertices, node_edges))
+            got.append(bfs.breadth_first_search(starting_node, ending_node[i], 
+            vertices, node_edges))
 
         for i in range(len(expected)):
-            self.assertEqual(expected, got, "breadth_first_search does not return the correct shortest path when {}".format(test_type[i]))
+            self.assertEqual(expected, got, 
+            "breadth_first_search does not return the correct shortest path when {}".format(test_type[i]))
 
     def test_output(self):
         """
