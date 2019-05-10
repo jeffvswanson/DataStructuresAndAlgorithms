@@ -2,22 +2,20 @@
 """Demonstration program of the depth first search (DFS) of a directed
 graph to demonstrate DFS's topological sort capabilities."""
 
-import sys
-
 from collections import defaultdict
 
 def main():
+
     print("This program demonstrates the topological sort characteristic \
-of depth first search (DFS) on a directed graph.\n")
+of depth first search (DFS) on a directed graph.\n", flush=True)
 
     node_edges = setup()
 
-    sys.setrecursionlimit(10000)
-    print("recursion_limit =", sys.getrecursionlimit())
-
     precedence_order = topological_sort(node_edges)
-
-    print("The precedent order of 50 is {}", precedence_order[50])
+    
+    print("is_explored[50] = {}".format(precedence_order[50]), flush=True)
+    print("is_explored[145678] = {}".format(precedence_order[145678]), flush=True)
+    #print("The precedent order of 50 is {}".format(precedence_order[50]))
 
 def setup():
     """
@@ -49,30 +47,35 @@ def topological_sort(node_edges):
         is_explored[key] = False
     
     # Keeps track of topological order
-    current_precedence = len(node_edges)
-    topological_order = defaultdict(int)
+    # current_precedence = len(node_edges)
+    # topological_order = defaultdict(int)
     
     for u in node_edges.keys():
         if is_explored[u] == False:
-            topological_order[u], is_explored[u], current_precedence \
-                = depth_first_search(node_edges, u, current_precedence, 
-                                    is_explored)
+            is_explored = depth_first_search(node_edges, u, is_explored)
+            
+            #topological_order[u], is_explored[u], current_precedence \
+            #    = depth_first_search(node_edges, u, current_precedence, 
+            #                        is_explored)
 
-    return topological_order
+    return is_explored# topological_order
 
-def depth_first_search(node_edges, u, current_precedence, is_explored):
+#def depth_first_search(node_edges, u, current_precedence, is_explored):
+def depth_first_search(node_edges, u, is_explored):
 
     is_explored[u] = True
 
     for v in node_edges[u]:
         if is_explored[v] == False:
-            current_precedence, is_explored[v], current_precedence \
-                = depth_first_search(node_edges, v, current_precedence, 
-                                    is_explored)
-    topological_order = current_precedence
-    current_precedence -= 1
-
-    return topological_order, is_explored[u], current_precedence
+            is_explored = depth_first_search(node_edges, v, is_explored)
+    #         current_precedence, is_explored[v], _ \
+    #             = depth_first_search(node_edges, v, current_precedence, 
+    #                                 is_explored)
+    # topological_order = current_precedence
+    # current_precedence -= 1
+    # print("current_precedence =", current_precedence)
+    
+    return is_explored #topological_order, is_explored[u], current_precedence
 
 if __name__ == "__main__":
     main()
