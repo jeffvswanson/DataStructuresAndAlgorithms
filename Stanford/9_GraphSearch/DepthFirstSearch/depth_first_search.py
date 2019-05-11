@@ -1,8 +1,29 @@
 # depth_first_search.py
 """Demonstration program of the depth first search (DFS) of a directed
-graph to demonstrate DFS's topological sort capabilities."""
+graph to demonstrate DFS's topological sort capabilities.
+
+This will not work natively on Windows computers. I was only able to 
+get it to work in a Linux Docker container running on Windows. I 
+cannot speak to native Linux or Mac implementations. This is due to 
+the recursion depth of the problem. On Windows I was able to only get
+to a maximum recursion depth of around 3921 plus or minus a few frames
+whether the stack size was set to 64 MB or 256 MB. The stack depth
+needed for this problem is at least 600497.
+
+The resource library is a Linux only library as well.
+"""
+
+import os
+import resource
+import sys
+import threading
 
 from collections import defaultdict
+
+resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, 
+                                            resource.RLIM_INFINITY))
+threading.stack_size(2 ** 25) # 32 MB
+sys.setrecursionlimit(2 ** 17)
 
 def main():
 
@@ -11,11 +32,11 @@ of depth first search (DFS) on a directed graph.\n", flush=True)
 
     node_edges = setup()
 
-    precedence_order = topological_sort(node_edges)
-    
-    print("is_explored[50] = {}".format(precedence_order[50]), flush=True)
-    print("is_explored[145678] = {}".format(precedence_order[145678]), flush=True)
-    #print("The precedent order of 50 is {}".format(precedence_order[50]))
+    topological_order = topological_sort(node_edges)
+
+    location = write_to_file(topological_order)
+
+    print("The file location is located in:", location)
 
 def setup():
     """
@@ -28,18 +49,35 @@ def setup():
     node_edges = defaultdict(list)
 
     with open("SCC.txt") as f:
-        # Exclude the newine character, \n
+        # Exclude the newline character, \n
+        line_number = 1
         for line in f:
             # Remove the trailing space and newline characters.
             # Otherwise, there are issues on import
             line = line.rstrip(' \n')
             line = line.split(' ')
 
-            node_edges[int(line[0])].append(int(line[1]))
+            source_node = int(line[0])
+            # Due to use of defaultdict add sink nodes. The reason is
+            # that with defaultdict when a key that is not in the 
+            # dictionary is searched the defaultdict will add an entry
+            # changing the size of the dictionary which is bad joojoo 
+            # when iterating over a dictionary and will result in:
+            # RuntimeError: dictionary changed size during iteration.
+            while line_number < source_node:
+                node_edges[line_number].append(line_number)
+                line_number += 1
+            
+            node_edges[source_node].append(int(line[1]))
+            line_number = source_node + 1
 
     return node_edges
 
 def topological_sort(node_edges):
+    """
+    Outer loop for depth-first search to keep track of a vertex's order
+    of precedence.
+    """
     
     # Mark all nodes as unexplored
     is_explored = defaultdict(bool)
@@ -47,35 +85,50 @@ def topological_sort(node_edges):
         is_explored[key] = False
     
     # Keeps track of topological order
-    # current_precedence = len(node_edges)
-    # topological_order = defaultdict(int)
-    
+    # precedence_order, a larger number means it has lower precedence
+    precedence_order = len(node_edges)
+    topological_order = defaultdict(int)
+
     for u in node_edges.keys():
         if is_explored[u] == False:
-            is_explored = depth_first_search(node_edges, u, is_explored)
-            
-            #topological_order[u], is_explored[u], current_precedence \
-            #    = depth_first_search(node_edges, u, current_precedence, 
-            #                        is_explored)
+            precedence_order = depth_first_search(node_edges, u, is_explored, 
+                                precedence_order, topological_order)
 
-    return is_explored# topological_order
+    return topological_order
 
-#def depth_first_search(node_edges, u, current_precedence, is_explored):
-def depth_first_search(node_edges, u, is_explored):
+def depth_first_search(node_edges, u, is_explored, precedence_order, 
+                        topological_order):
+    """
+    Depth first search implementation. Searches a directed graph until
+    the search hits an explored node and returns where the node is 
+    in relation to the other vertices.
+    """
 
     is_explored[u] = True
 
     for v in node_edges[u]:
         if is_explored[v] == False:
-            is_explored = depth_first_search(node_edges, v, is_explored)
-    #         current_precedence, is_explored[v], _ \
-    #             = depth_first_search(node_edges, v, current_precedence, 
-    #                                 is_explored)
-    # topological_order = current_precedence
-    # current_precedence -= 1
-    # print("current_precedence =", current_precedence)
+            precedence_order = depth_first_search(node_edges, v, is_explored, 
+                                precedence_order, topological_order)
+
+    topological_order[u] = precedence_order
+    precedence_order -= 1
     
-    return is_explored #topological_order, is_explored[u], current_precedence
+    return precedence_order
+
+def write_to_file(topological_order):
+    """
+    Writes the topological order to a file for inspection.
+    """
+
+    with open("topological_order.txt","w") as f:
+        for k, v in sorted(topological_order.items()):
+            f.write("{}\t\t\t{}\n".format(k, v))
+
+    return os.getcwd()
+
+t = threading.Thread(target=main)
+t.start()
 
 if __name__ == "__main__":
     main()
