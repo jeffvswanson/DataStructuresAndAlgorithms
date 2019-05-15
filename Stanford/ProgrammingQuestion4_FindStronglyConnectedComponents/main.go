@@ -29,7 +29,7 @@ import (
 func main() {
 	fmt.Println("This program demonstrates Kosaraju's Two-Pass algorithm on a directed graph.")
 
-	nodeEdges, maxNode := setup("SCC.txt")
+	nodeEdges, initFinishOrder, maxNode := setup("SCC.txt")
 
 	// Step 1: Given a directed graph, reverse the graph.
 	// That is, a --> b becomes a <-- b.
@@ -37,23 +37,24 @@ func main() {
 
 	// Step 2, Pass 1: Run a topological sort using the reversed graph.
 	// This step gives an ordering of nodes used in the next step.
-	finishOrder, _ := topologicalSort(reversedNodeEdges, maxNode, nil)
+	finishOrder, _ := topologicalSort(reversedNodeEdges, maxNode, initFinishOrder)
 
 	// Step 3, Pass 2: Run a topological sort with the original graph.
 	// This step discovers the SCCs.
-	stronglyConnected, sortedKeys := topologicalSort(nodeEdges, maxNode, finishOrder)
+	_, stronglyConnected := topologicalSort(nodeEdges, maxNode, finishOrder)
 
-	writeToFile(stronglyConnected, sortedKeys)
+	writeToFile(stronglyConnected)
+	top5(stronglyConnected)
 }
 
-func setup(fileName string) (map[int][]int, int) {
+func setup(fileName string) (map[int][]int, map[int]int, int) {
 	// converts the SCC.txt file into a Go useable format.
 
 	file, err := os.Open(fileName)
 	defer file.Close()
 	if err != nil {
 		fmt.Println(err)
-		return nil, 0
+		return nil, nil, 0
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -80,9 +81,19 @@ func setup(fileName string) (map[int][]int, int) {
 		if v[0] > maxNode {
 			maxNode = v[0]
 		}
-
 	}
-	return nodeEdges, maxNode
+
+	// Some nodes are only tails and must be accounted for.
+	ascendingFinishOrder := make(map[int]int)
+
+	for node := 1; node <= maxNode; node++ {
+		ascendingFinishOrder[node] = node
+		if _, head := nodeEdges[node]; !head {
+			nodeEdges[node] = []int{node}
+		}
+	}
+
+	return nodeEdges, ascendingFinishOrder, maxNode
 }
 
 func reverseGraph(originalGraph map[int][]int) map[int][]int {
@@ -90,74 +101,110 @@ func reverseGraph(originalGraph map[int][]int) map[int][]int {
 
 	reversedGraph := make(map[int][]int)
 
-	for key, value := range originalGraph {
-		for _, val := range value {
-			reversedGraph[val] = append(reversedGraph[val], key)
+	for head, tails := range originalGraph {
+		for _, tail := range tails {
+			reversedGraph[tail] = append(reversedGraph[tail], head)
+		}
+	}
+
+	// Some nodes are only sources in the original graph and will not
+	// be represented in the reversed graph if they do not have self-
+	// references.
+	for node := 1; node <= len(originalGraph); node++ {
+		if _, ok := reversedGraph[node]; !ok {
+			reversedGraph[node] = []int{node}
 		}
 	}
 
 	return reversedGraph
 }
 
-func topologicalSort(nodeEdges map[int][]int, maxNode int, finishOrder map[int]int) (map[int]int, []int) {
+func topologicalSort(nodeEdges map[int][]int, maxNode int, finishOrder map[int]int) (map[int]int, map[int][]int) {
 	// Outer loop for depth first search to keep track of a vertex's
-	// order of precedence.
+	// order of finishing, that is, when the inner loop,
+	// depthFirstSearch(), cannot recurse any further.
 
-	// Mark all nodes as unexplored
+	// Mark all nodes as unexplored.
 	isExplored := make(map[int]bool)
-	// Create a slice of sorted keys since Go maps are not ordered.
-	// This will help the return of topological order by giving a
-	// consistent entry point into the graph.
-	sortedKeys := make([]int, maxNode)
-	for key := 1; key <= maxNode; key++ {
-		isExplored[key] = false
-		sortedKeys[key-1] = key
+	for node := 1; node <= len(nodeEdges); node++ {
+		isExplored[node] = false
 	}
 
-	// precedenceOrder, a larger number means it has lower precedence
-	precedenceOrder := maxNode
-	topologicalOrder := make(map[int]int)
+	// finishingOrder, a lower value means the node processed first
+	var finishingOrder, leadNode int
+	stronglyConnected := make(map[int][]int)
 
-	for u := range sortedKeys {
+	// Have to make a true copy without changing the original map.
+	finishOrderCopy := make(map[int]int)
+	for key, value := range finishOrder {
+		finishOrderCopy[key] = value
+	}
+
+	for i := len(finishOrder); i > 0; i-- {
+		u := finishOrder[i]
 		if !isExplored[u] {
-			precedenceOrder = depthFirstSearch(nodeEdges, topologicalOrder,
-				isExplored, u, precedenceOrder)
+			leadNode = u
+			finishingOrder = depthFirstSearch(nodeEdges, stronglyConnected,
+				finishOrderCopy, isExplored, u, finishingOrder, leadNode)
 		}
 	}
-	return topologicalOrder, sortedKeys
+
+	return finishOrderCopy, stronglyConnected
 }
 
-func depthFirstSearch(nodeEdges map[int][]int, topologicalOrder map[int]int, isExplored map[int]bool, u, precedenceOrder int) int {
+func depthFirstSearch(nodeEdges, stronglyConnected map[int][]int,
+	finishOrderCopy map[int]int, isExplored map[int]bool, u, finishingOrder,
+	leadNode int) int {
 	// Depth first search implementation. Searches a directed graph
 	// until the search hits an explored node and returns where the
 	// node is in relation to other vertices.
 
 	isExplored[u] = true
 
-	for v := range nodeEdges[u] {
+	stronglyConnected[leadNode] = append(stronglyConnected[leadNode], u)
+
+	for _, v := range nodeEdges[u] {
 		if !isExplored[v] {
-			precedenceOrder = depthFirstSearch(nodeEdges, topologicalOrder,
-				isExplored, v, precedenceOrder)
+			finishingOrder = depthFirstSearch(nodeEdges, stronglyConnected,
+				finishOrderCopy, isExplored, v, finishingOrder, leadNode)
 		}
 	}
-	topologicalOrder[u] = precedenceOrder
-	precedenceOrder--
+	finishingOrder++
+	finishOrderCopy[finishingOrder] = u
 
-	return precedenceOrder
+	return finishingOrder
 }
 
-func writeToFile(topologicalOrder map[int]int, sortedKeys []int) {
+func writeToFile(stronglyConnected map[int][]int) {
 	f, err := os.Create("StronglyConnectedComponents.txt")
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer f.Close()
 
-	for _, key := range sortedKeys {
-		_, err := f.WriteString(fmt.Sprintf("%d\t\t\t%d\n", key, topologicalOrder[key]))
+	for key := range stronglyConnected {
+		_, err := f.WriteString(fmt.Sprintf("Node %d is strongly connected with %v nodes\n", key, len(stronglyConnected[key])))
 		if err != nil {
 			fmt.Println(err)
 		}
 	}
 	f.Sync()
+}
+
+func top5(stronglyConnected map[int][]int) {
+
+	maxConnections := make([]int, 1)
+	for _, v := range stronglyConnected {
+		if len(v) > maxConnections[0] {
+			// Prepend the largest values
+			maxConnections = append(maxConnections, 0)
+			copy(maxConnections[1:], maxConnections)
+			maxConnections[0] = len(v)
+		}
+	}
+	if len(maxConnections) < 5 {
+		fmt.Println("max Connections:", maxConnections)
+	} else {
+		fmt.Println("max Connections:", maxConnections[:5])
+	}
 }
