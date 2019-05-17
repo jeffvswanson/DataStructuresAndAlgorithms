@@ -22,7 +22,6 @@ I cannot speak to its viability in Mac, but if you use a Docker container the in
 `docker build -t depth_first_search .`
 6. Once the image is built you can create a container.
 `docker run depth-first-search` On my computer the process took about 30 seconds. 
-You will see two outputs. This is normal and due to instantiating another thread to run the program, but it works.
 ### Viewing the output
 Once the program has ran you can move the topological_order.txt file from the Docker container to your host machine.
 1. In the terminal run the command, `docker ps -a`, to get the container ID. You will receive an alphanumeric string, for example, e1f5f82fd458 and you will use it in the next command.

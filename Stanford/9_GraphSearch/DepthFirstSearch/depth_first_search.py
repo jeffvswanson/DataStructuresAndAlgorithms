@@ -16,13 +16,11 @@ The resource library is a Linux only library as well.
 import os
 import resource
 import sys
-import threading
 
 from collections import defaultdict
 
 resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, 
                                             resource.RLIM_INFINITY))
-threading.stack_size(2 ** 25) # 32 MB
 sys.setrecursionlimit(2 ** 17)
 
 def main():
@@ -126,9 +124,6 @@ def write_to_file(topological_order):
             f.write("{}\t\t\t{}\n".format(k, v))
 
     return os.getcwd()
-
-t = threading.Thread(target=main)
-t.start()
 
 if __name__ == "__main__":
     main()
