@@ -22,6 +22,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -36,15 +37,15 @@ func main() {
 	reversedNodeEdges := reverseGraph(nodeEdges)
 
 	// Step 2, Pass 1: Run a topological sort using the reversed graph.
-	// This step gives an ordering of nodes used in the next step.
+	// This step gives the order to search nodes in the next step.
 	finishOrder, _ := topologicalSort(reversedNodeEdges, maxNode, initFinishOrder)
 
 	// Step 3, Pass 2: Run a topological sort with the original graph.
 	// This step discovers the SCCs.
 	_, stronglyConnected := topologicalSort(nodeEdges, maxNode, finishOrder)
 
-	writeToFile(stronglyConnected)
-	top5(stronglyConnected)
+	output := top5(stronglyConnected, maxNode)
+	fmt.Print(output)
 }
 
 func setup(fileName string) (map[int][]int, map[int]int, int) {
@@ -175,36 +176,24 @@ func depthFirstSearch(nodeEdges, stronglyConnected map[int][]int,
 	return finishingOrder
 }
 
-func writeToFile(stronglyConnected map[int][]int) {
-	f, err := os.Create("StronglyConnectedComponents.txt")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer f.Close()
+func top5(stronglyConnected map[int][]int, maxNode int) string {
 
-	for key := range stronglyConnected {
-		_, err := f.WriteString(fmt.Sprintf("Node %d is strongly connected with %v nodes\n", key, len(stronglyConnected[key])))
-		if err != nil {
-			fmt.Println(err)
+	var output string
+	maxConnections := make([]int, 0)
+
+	for node := 1; node <= maxNode; node++ {
+		if len(stronglyConnected[node]) > 0 {
+			maxConnections = append(maxConnections, len(stronglyConnected[node]))
 		}
 	}
-	f.Sync()
-}
 
-func top5(stronglyConnected map[int][]int) {
+	sort.Sort(sort.Reverse(sort.IntSlice(maxConnections)))
 
-	maxConnections := make([]int, 1)
-	for _, v := range stronglyConnected {
-		if len(v) > maxConnections[0] {
-			// Prepend the largest values
-			maxConnections = append(maxConnections, 0)
-			copy(maxConnections[1:], maxConnections)
-			maxConnections[0] = len(v)
-		}
-	}
 	if len(maxConnections) < 5 {
-		fmt.Println("max Connections:", maxConnections)
+		output = fmt.Sprintln("max Connections:", maxConnections)
 	} else {
-		fmt.Println("max Connections:", maxConnections[:5])
+		output = fmt.Sprintln("max Connections:", maxConnections[:5])
 	}
+
+	return output
 }
