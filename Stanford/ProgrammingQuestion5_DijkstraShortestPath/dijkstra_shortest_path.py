@@ -41,50 +41,25 @@ class Node:
 
 def main():
 
-    # Get all the nodes put into an array
-    # Run a BFS from node 1 to find connected nodes and have those 
     # nodes put in an exploration array
     # Have an array storing the distance from 1 to an explored node
     # Return the distances for the nodes requested.
-    setup()
+    source_node = 1
+    graph = setup()
 
     # Breadth-first search to eliminate nodes not connected to source
     # If node not connected to source distance = 1000000
+    connected_to_source = breadth_first_search(graph, source_node)
+    for node in graph.keys():
+        if node in connected_to_source:
+            continue
+        else:
+            graph[source_node].append((node, 1000000))
     
     # Return the distance from node 1 to the following ten vertices, in
     # order: 7, 37, 59, 82, 99, 115, 165, 188, 197
-    distance_to_node = [7, 37, 59, 82, 99, 115, 165, 188, 197]
-    output(distance_to_node)
-
-def find_shortest_paths(source_node, connected_nodes):
-    """
-    Finds the shortest paths for all nodes connected to the source node.
-    """
-
-    explored = [1]
-
-    for idx, _ in enumerate(connected_nodes):
-        # Want connections that have been explored as tail and those 
-        # nodes that have not yet been explored as head
-        
-        unexplored = connected_nodes[idx:]
-        shortest_path_length = 1000000
-        shortest_edge = (0, 0)
-
-        for v_star in explored:
-            for w_star in unexplored:
-                if w_star in v_star.connections:
-                    path_length = find_path_length(v_star, w_star)
-                    if path_length < shortest_path_length:
-                        shortest_path_length = path_length
-                        shortest_edge = (v_star, w_star)
-            explored.append(shortest_edge[1])
-
-
-def find_path_length():
-    """
-    Finds the shortest path between two nodes
-    """
+    # distance_to_node = [7, 37, 59, 82, 99, 115, 165, 188, 197]
+    # output(distance_to_node)
 
 def setup():
     """
@@ -102,15 +77,81 @@ def setup():
             line = line.split('\t')
 
             source_node = int(line[0])
-            node_edges[source_node]
-            
-def output(nodes_in_question):
+
+            for val in line[1:]:
+                node_edge = val.split(',')
+                node_edges[source_node].append((int(node_edge[0]), int(node_edge[1])))
+
+    return node_edges
+
+def breadth_first_search(graph, source_node):
     """
-    Prints the distance from the source node to the node in question.
+    Conducts a breadth-first search to determine connections to the
+    source node.
     """
 
-    for node in nodes_in_question:
-        print("From node 1 to node {}, the distance is: {}.".format(node, distance))
+    # Set all nodes as unexplored.
+    nodes = defaultdict(list)
+    # Set the source node as explored
+    nodes["Explored"].append(source_node)
+
+    # Let q = queue data structure (First-in, First-out (FIFO))
+    # initialized with the source node.
+    q = [source_node]
+
+    while len(q) != 0:
+        v = q.pop(0)
+        # Explore the different edges v possesses (v, w)
+        for connection in graph[v]:
+            w = connection[0]
+            if w in nodes["Explored"]:
+                continue
+            else:
+                nodes["Explored"].append(w)
+                q.append(w)
+
+    return nodes["Explored"]
+
+# def find_shortest_paths(source_node, connected_nodes):
+#     """
+#     Finds the shortest paths for all nodes connected to the source node.
+#     """
+
+#     explored = [1]
+
+#     for idx, _ in enumerate(connected_nodes):
+#         # Want connections that have been explored as tail and those 
+#         # nodes that have not yet been explored as head
+        
+#         unexplored = connected_nodes[idx:]
+#         shortest_path_length = 1000000
+#         shortest_edge = (0, 0)
+
+#         for v_star in explored:
+#             for w_star in unexplored:
+#                 if w_star in v_star.connections:
+#                     path_length = find_path_length(v_star, w_star)
+#                     if path_length < shortest_path_length:
+#                         shortest_path_length = path_length
+#                         shortest_edge = (v_star, w_star)
+#             explored.append(shortest_edge[1])
+
+
+def find_path_length():
+    """
+    Finds the shortest path between two nodes
+    """
+    pass
+
+
+            
+# def output(nodes_in_question):
+#     """
+#     Prints the distance from the source node to the node in question.
+#     """
+    
+#     for node in nodes_in_question:
+#         print("From node 1 to node {}, the distance is: {}.".format(node, distance))
 
 if __name__ == "__main__":
     main()
