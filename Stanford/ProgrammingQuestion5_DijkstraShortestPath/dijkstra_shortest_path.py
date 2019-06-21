@@ -32,6 +32,7 @@ to maintain some kind of mapping between vertices and their positions
 in the heap.
 """
 
+from collections import Counter
 from collections import defaultdict
 
 class Node:
@@ -55,11 +56,13 @@ def main():
             continue
         else:
             graph[source_node].append((node, 1000000))
+
+    distance_to_source = find_shortest_path(graph, source_node)
     
     # Return the distance from node 1 to the following ten vertices, in
     # order: 7, 37, 59, 82, 99, 115, 165, 188, 197
-    # distance_to_node = [7, 37, 59, 82, 99, 115, 165, 188, 197]
-    # output(distance_to_node)
+    distance_to_node = [7, 37, 59, 82, 99, 115, 133, 165, 188, 197]
+    output(distance_to_node, distance_to_source)
 
 def setup():
     """
@@ -112,46 +115,42 @@ def breadth_first_search(graph, source_node):
 
     return nodes["Explored"]
 
-# def find_shortest_paths(source_node, connected_nodes):
-#     """
-#     Finds the shortest paths for all nodes connected to the source node.
-#     """
-
-#     explored = [1]
-
-#     for idx, _ in enumerate(connected_nodes):
-#         # Want connections that have been explored as tail and those 
-#         # nodes that have not yet been explored as head
-        
-#         unexplored = connected_nodes[idx:]
-#         shortest_path_length = 1000000
-#         shortest_edge = (0, 0)
-
-#         for v_star in explored:
-#             for w_star in unexplored:
-#                 if w_star in v_star.connections:
-#                     path_length = find_path_length(v_star, w_star)
-#                     if path_length < shortest_path_length:
-#                         shortest_path_length = path_length
-#                         shortest_edge = (v_star, w_star)
-#             explored.append(shortest_edge[1])
-
-
-def find_path_length():
+def find_shortest_path(graph, source_node):
     """
-    Finds the shortest path between two nodes
+    Finds the shortest path between two nodes using Dijkstra's shortest
+    path algorithm.
     """
-    pass
 
-
-            
-# def output(nodes_in_question):
-#     """
-#     Prints the distance from the source node to the node in question.
-#     """
+    # Shortest distance to source node is 0.
+    distances_to_node = [None] * len(graph)
+    distances_to_node[0] = 0
     
-#     for node in nodes_in_question:
-#         print("From node 1 to node {}, the distance is: {}.".format(node, distance))
+    list_of_vertices_processed = [source_node]
+
+    while Counter(list_of_vertices_processed) != Counter(graph.keys()):
+        # (source_node, ending_node, distance)
+        shortest_path = (source_node, source_node, 10000000) # Use arbitrarily large number
+        for v_star in list_of_vertices_processed:
+            for w_star in graph[v_star]:
+                if w_star[0] in list_of_vertices_processed:
+                    continue
+                else:                    
+                    path_length = distances_to_node[v_star-1] + w_star[1]
+                    if path_length < shortest_path[2]:
+                        shortest_path = (source_node, w_star[0], path_length)
+        if shortest_path[1] != source_node:
+            list_of_vertices_processed.append(shortest_path[1])
+            distances_to_node[shortest_path[1]-1] = shortest_path[2]
+
+    return distances_to_node
+
+def output(nodes_in_question, distances):
+    """
+    Prints the distance from the source node to the node in question.
+    """
+    
+    for node in nodes_in_question:
+        print("From node 1 to node {} the distance is: {}.".format(node, distances[node-1]))
 
 if __name__ == "__main__":
     main()
