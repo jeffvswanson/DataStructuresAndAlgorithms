@@ -1,5 +1,5 @@
 /*
-An implementation of Dijktra's shortest-path algorithm.
+An implementation of Dijkstra's shortest-path algorithm.
 
 The file contains an adjacency list representation of an undirected
 weighted graph with 200 vertices labeled 1 to 200. Each row consists
@@ -166,19 +166,17 @@ func breadthFirstSearch(graph map[int][]connection, sourceNode int) map[int][]co
 			q = q[1:]
 		}
 		// Explore the different edges u possesses, (u, v).
-		for _, v := range graph[u] {
-			if !isExplored[v.Sink] {
-				if isExplored[v.Sink] {
-					continue
-				} else {
+		if _, prs := graph[u]; prs {
+			for _, v := range graph[u] {
+				if !isExplored[v.Sink] {
 					isExplored[v.Sink] = true
 					q = append(q, v.Sink)
 				}
 			}
 		}
 	}
-	for node := range isExplored {
-		if _, ok := graph[node]; !ok {
+	for node := range graph {
+		if !isExplored[node] {
 			delete(searchedGraph, node)
 		}
 	}
@@ -192,54 +190,34 @@ func findShortestPath(graph map[int][]connection, sourceNode int) []int {
 	distanceTo := make([]int, len(graph))
 	distanceTo[0] = 0
 
-	// Let vp be the list of vertices processed so far
-	vp := make(map[int]bool)
-	vp[sourceNode] = true
+	// Let v be the list of vertices processed so far
+	v := make(map[int]struct{})
+	v[sourceNode] = struct{}{}
 
-	/*
-		*************************************************
-		The problem with 59 and 197 not showing up lies in how the for loop is set up.
-		*************************************************
-		Idea convert vp to a slice
-		Convert the keys in graph to a slice
-		At the start of the loop check if the two slices are equal (O(n^2)), has to be faster
-		Place wStar values in the appropriate index position when added to vp.
-	*/
-	for k := range graph {
-		if _, prs := vp[k]; !prs {
-			// Use arbitrarily large number
-			shortestPath := path{
-				Head:   sourceNode,
-				Tail:   sourceNode,
-				Length: 10000000,
-			}
-			for vStar := range vp {
-				for _, wStar := range graph[vStar] {
-					if _, prs := vp[wStar.Sink]; !prs {
-						pathLength := distanceTo[vStar-1] + wStar.Distance
-						if pathLength < shortestPath.Length {
-							shortestPath = path{
-								Head:   sourceNode,
-								Tail:   wStar.Sink,
-								Length: pathLength,
-							}
-							if shortestPath.Tail == 59 {
-								fmt.Println("59 was assigned!", shortestPath.Length)
-							}
+	for len(v) < len(graph) {
+		// Use arbitrarily large number
+		shortestPath := path{
+			Head:   sourceNode,
+			Tail:   sourceNode,
+			Length: 10000000,
+		}
+		for vStar := range v {
+			for _, wStar := range graph[vStar] {
+				if _, prs := v[wStar.Sink]; !prs {
+					pathLength := distanceTo[vStar-1] + wStar.Distance
+					if pathLength < shortestPath.Length {
+						shortestPath = path{
+							Head:   sourceNode,
+							Tail:   wStar.Sink,
+							Length: pathLength,
 						}
 					}
 				}
 			}
-			if shortestPath.Tail == 59 || shortestPath.Tail == 7 {
-				fmt.Printf("%d - %d\n", shortestPath.Tail, shortestPath.Length)
-			}
-			if shortestPath.Tail != sourceNode {
-				if shortestPath.Tail == 59 {
-					fmt.Println("Here's node 59!")
-				}
-				vp[shortestPath.Tail] = true
-				distanceTo[shortestPath.Tail-1] = shortestPath.Length
-			}
+		}
+		if shortestPath.Tail != sourceNode {
+			v[shortestPath.Tail] = struct{}{}
+			distanceTo[shortestPath.Tail-1] = shortestPath.Length
 		}
 	}
 	return distanceTo
