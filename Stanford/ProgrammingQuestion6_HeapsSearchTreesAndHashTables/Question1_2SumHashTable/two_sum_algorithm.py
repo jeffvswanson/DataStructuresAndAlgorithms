@@ -23,67 +23,55 @@ performance under the chaining and open addressing approaches to
 resolving collisions.
 """
 
-import numpy as np
+import copy
 
 def main():
-    # Insert elements in the .txt into a hash table, H1, ensuring 
+    # Insert elements in the .txt into a hash table, h, ensuring 
     # duplicate elements are not inserted.
-    # Create second hash table, H2, for the values -10000 to 10000 
+    # Create second list, target_list, for the values -10000 to 10000 
     # inclusive.
-    h1, h2 = setup()
-    h2_length = len(h1)
+    h, target_list = setup()
 
     # For each value, x, in the .txt file, check if there is a 
-    # value, y, in H1 that satisfies t-x=y.
-        # If present delete t from H2
-    # After going through all the values return the length of H2.
-    h2_final_length = two_sum_search(h1, h2)
-
-    # The number of times a target value was found is the difference 
-    # between the original length of h2 and the final length of h2.
-    t_values = h2_length - h2_final_length
+    # value, y, in h that satisfies t-x=y.
+    # After going through all the values return the count of targets
+    # found.
+    num_found_targets = two_sum_search(h, target_list)
     
-    print("The number of target values found to have sums was {}".format(t_values))
+    print("The number of target values found to have sums was {}.".format(num_found_targets))
 
 def setup():
     """
-    setup hashes elements into hash tables.
+    setup hashes elements into dictionaries (hash tables).
     """
 
-    
-
-    # Since there are 1 million possible inputs for h1, 
-    # let n1 be prime 2000003 gives a low load factor.
-    n1 = 2000003
-    h1 = np.zeros(n1)
-
-    # Since there are 20001 possible inputs for h2,
-    # let n2 be prime 40111.
-    n2 = 40111
-    h2 = np.zeros(n2)
+    h, target_values = set(), set()
+    for x in range(-10000, 10001):
+        target_values.add(x)
 
     with open("algo1-programming_prob-2sum.txt") as f:
         # Exclude the newline character, \n
         for line in f:
             x = int(line.rstrip('\n'))
+            h.add(x)
             
-            h1[hash_it(x, n1)]
+    return h, target_values
 
-    for i in range(-10000, 10001):
-        h2[hash_it(i, n2)]
-            
-    return h1, h2
-
-def hash_it(x, n):
-    return x%n
-
-def two_sum_search(h1, h2):
+def two_sum_search(h, targets):
     """
-    two_sum_search checks each value in h1 two see if two numbers in h1
-    reach one of the target values remaining in h2.
+    two_sum_search checks each value in h to see if two numbers in h
+    reach one of the target values in the target list.
     """
-    return len(h2)
 
+    final_set = copy.deepcopy(targets)
+
+    for t in targets:
+        for x in h:
+            if t-x in h:
+                final_set.discard(t)
+                break
+
+    return len(final_set)
 
 if __name__ == "__main__":
     main()
