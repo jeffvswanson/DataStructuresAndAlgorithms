@@ -71,7 +71,7 @@ def two_sum_search(h, targets):
                 final_set.discard(t)
                 break
 
-    return len(final_set)
+    return len(targets) - len(final_set)
 
 if __name__ == "__main__":
     main()
