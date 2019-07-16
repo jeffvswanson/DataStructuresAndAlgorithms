@@ -182,12 +182,203 @@ func TestBubbleUp(t *testing.T) {
 	}
 }
 
-// func TestInsert(t *testing.T) {}
+func TestInsert(t *testing.T) {
 
-// func TestLeftIndex(t *testing.T) {}
+	type input struct {
+		num int
+		h   heap
+	}
 
-// func TestRightIndex(t *testing.T) {}
+	minInput1 := input{1, heap{Type: "min", xi: []int{0}}}
+	maxInput1 := input{1, heap{Type: "max", xi: []int{0}}}
+	minInput2 := input{2, heap{Type: "min", xi: []int{0, 1}}}
+	maxInput2 := input{0, heap{Type: "max", xi: []int{0, -1}}}
+	minInput3 := input{0, heap{Type: "min", xi: []int{0, 1, 2}}}
+	maxInput3 := input{3, heap{Type: "max", xi: []int{0, 0, -1}}}
 
-// func TestBubbleDown(t *testing.T) {}
+	tests := map[string]struct {
+		input
+		want heap
+	}{
+		"min-heap insert to new heap":   {minInput1, heap{Type: "min", xi: []int{0, 1}}},
+		"max-heap insert to new heap":   {maxInput1, heap{Type: "max", xi: []int{0, -1}}},
+		"min-heap insert larger input":  {minInput2, heap{Type: "min", xi: []int{0, 1, 2}}},
+		"max-heap insert smaller input": {maxInput2, heap{Type: "max", xi: []int{0, -1, 0}}},
+		"min-heap insert new min input": {minInput3, heap{Type: "min", xi: []int{0, 0, 2, 1}}},
+		"max-heap insert new max input": {maxInput3, heap{Type: "max", xi: []int{0, -3, -1, 0}}},
+	}
 
-// func TestExtractRoot(t *testing.T) {}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			tc.h.insert(tc.num)
+			for i, got := range tc.input.h.xi {
+				if got != tc.want.xi[i] {
+					t.Fatalf("at index position %d after insert() expected: %d, got: %d\n", i, tc.want.xi[i], got)
+				}
+			}
+		})
+	}
+}
+
+func TestLeftIndex(t *testing.T) {
+
+	type want struct {
+		index  int
+		exists bool
+	}
+
+	h := heap{Type: "min", xi: []int{0, 1, 2, 3, 4, 5}}
+
+	tests := map[string]struct {
+		input int
+		want
+	}{
+		"has left child": {2, want{4, true}},
+		"no left child":  {4, want{0, false}},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, prs := h.leftIndex(tc.input)
+			if got != tc.index || prs != tc.exists {
+				t.Fatalf("Expected: %d, %t; Got: %d, %t", tc.index, tc.exists, got, prs)
+			}
+		})
+	}
+}
+
+func TestRightIndex(t *testing.T) {
+
+	type want struct {
+		index  int
+		exists bool
+	}
+
+	h := heap{Type: "max", xi: []int{0, 10, 9, 8, 7, 6}}
+
+	tests := map[string]struct {
+		input int
+		want
+	}{
+		"has right child": {2, want{5, true}},
+		"no right child":  {4, want{0, false}},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, prs := h.rightIndex(tc.input)
+			if got != tc.index || prs != tc.exists {
+				t.Fatalf("Expected: %d, %t; Got: %d, %t", tc.index, tc.exists, got, prs)
+			}
+		})
+	}
+}
+
+func TestBubbleDown(t *testing.T) {
+
+	type input struct {
+		index int
+		h     heap
+	}
+
+	minHeap := input{1, heap{Type: "min", xi: []int{0, 10, 2, 3, 4, 5}}}
+	maxHeap := input{1, heap{Type: "max", xi: []int{0, -1, -5, -4, -3, -2}}}
+
+	tests := map[string]struct {
+		input
+		want heap
+	}{
+		"min-heap bubbledown": {minHeap, heap{Type: "min", xi: []int{0, 2, 4, 3, 10, 5}}},
+		"max-heap bubbledown": {maxHeap, heap{Type: "max", xi: []int{0, -5, -3, -4, -1, -2}}},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			tc.h.bubbleDown(tc.index)
+			for i, got := range tc.h.xi {
+				if got != tc.want.xi[i] {
+					t.Fatalf("At index position %d - Expected: %d, Got: %d", i, tc.want.xi[i], got)
+				}
+			}
+		})
+	}
+}
+
+func TestExtractRoot(t *testing.T) {
+
+	type want struct {
+		root   int
+		exists bool
+	}
+
+	tests := map[string]struct {
+		h heap
+		want
+	}{
+		"extract from empty heap":      {heap{Type: "min", xi: []int{0}}, want{0, false}},
+		"extract from min-heap":        {heap{Type: "min", xi: []int{0, 1, 2, 3, 4, 5}}, want{1, true}},
+		"second extract from min-heap": {heap{Type: "min", xi: []int{0, 2, 4, 3, 5}}, want{2, true}},
+		"extract from max-heap":        {heap{Type: "max", xi: []int{0, -10, -9, -8, -7, -6}}, want{10, true}},
+		"second extract from max-heap": {heap{Type: "max", xi: []int{0, -9, -8, -6, -7}}, want{9, true}},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, prs := tc.h.extractRoot()
+			if got != tc.want.root || prs != tc.want.exists {
+				t.Fatalf("Expected: %d, %t; Got: %d, %t\n", tc.want.root, tc.want.exists, got, prs)
+			}
+		})
+	}
+}
+
+func TestRebalance(t *testing.T) {
+
+	twoDiffHeaps := []heap{
+		heap{Type: "min", xi: []int{0, 6, 7, 8, 9, 10}},
+		heap{Type: "max", xi: []int{0, -5, -4, -3}},
+	}
+	wantTwoDH := []heap{
+		heap{Type: "min", xi: []int{0, 7, 9, 8, 10}},
+		heap{Type: "max", xi: []int{0, -6, -5, -3, -4}},
+	}
+
+	threeDiffHeaps := []heap{
+		heap{Type: "min", xi: []int{0, 6, 7}},
+		heap{Type: "max", xi: []int{0, -5, -4, -3, -2, -1, 0}},
+	}
+	wantThreeDH := []heap{
+		heap{Type: "min", xi: []int{0, 4, 5, 6, 7}},
+		heap{Type: "max", xi: []int{0, -3, -2, -1, 0}},
+	}
+
+	tests := map[string]struct {
+		input []heap
+		want  []heap
+	}{
+		"heaps differ by two elements":           {twoDiffHeaps, wantTwoDH},
+		"heaps differ by more than two elements": {threeDiffHeaps, wantThreeDH},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got0, got1 := rebalance(tc.input[0], tc.input[1])
+			if len(got0.xi) != len(tc.want[0].xi) {
+				t.Fatalf("Expected length heap[0]: %d, Got length: %d\n", len(tc.want[0].xi), len(got0.xi))
+			} else if len(got1.xi) != len(tc.want[1].xi) {
+				t.Fatalf("Expected length heap[1]: %d, Got length: %d\n", len(tc.want[1].xi), len(got1.xi))
+			}
+			for i, got := range got0.xi {
+				if got != tc.want[0].xi[i] {
+					t.Fatalf("At index %d of got0 - Expected: %d, Got %d\n", i, tc.want[0].xi[i], got)
+				}
+			}
+			for i, got := range got1.xi {
+				if got != tc.want[1].xi[i] {
+					t.Fatalf("At index %d of got1 -Expected: %d, Got %d\n", i, tc.want[1].xi[i], got)
+				}
+			}
+		})
+	}
+
+}

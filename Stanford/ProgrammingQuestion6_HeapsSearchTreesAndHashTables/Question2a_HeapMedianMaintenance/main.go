@@ -43,10 +43,10 @@ func main() {
 	defer f.Close()
 
 	// highValHeap stores the higher half of elements in the set in a min-heap.
-	highValHeap := heap{Type: "min"}
+	highValHeap := heap{Type: "min", xi: []int{0}}
 
 	// lowValHeap storse the lower half of elements in the set in a max-heap.
-	lowValHeap := heap{Type: "max"}
+	lowValHeap := heap{Type: "max", xi: []int{0}}
 
 	median, medianTotal := 0, 0
 
@@ -68,7 +68,7 @@ func main() {
 		}
 
 		// Check if heaps need to be rebalanced
-		rebalance(&lowValHeap, &highValHeap)
+		lowValHeap, highValHeap = rebalance(lowValHeap, highValHeap)
 
 		// Calculate the median given the new x
 		median = findMedian(&lowValHeap, &highValHeap)
@@ -79,7 +79,7 @@ func main() {
 
 	// Once the file is exhausted returnValue = medianTotal%10000.
 	output := findLastFour(medianTotal)
-	fmt.Printf("The last four digits of the sums of the medians is %d\n", output)
+	fmt.Printf("The last four digits of the sums of the medians is %d.\n", output)
 }
 
 // findLastFour returns the last four numbers of an integer.
@@ -111,9 +111,9 @@ func findMedian(lowValHeap, highValHeap *heap) int {
 
 // rebalance ensures the two input heaps remain within one element
 // of one another.
-func rebalance(h1, h2 *heap) {
+func rebalance(h1, h2 heap) (heap, heap) {
 
-	if math.Abs(float64(h1.hLen())-float64(h2.hLen())) > 1 {
+	if int(math.Abs(float64(h1.hLen())-float64(h2.hLen()))) > 1 {
 		if h1.hLen() > h2.hLen() {
 			root, prs := h1.extractRoot()
 			if prs {
@@ -125,8 +125,9 @@ func rebalance(h1, h2 *heap) {
 				h1.insert(root)
 			}
 		}
-		rebalance(h1, h2)
+		h1, h2 = rebalance(h1, h2)
 	}
+	return h1, h2
 }
 
 // hLen returns the length of a slice with a 1-based index.
@@ -165,7 +166,7 @@ func (h *heap) extractRoot() (int, bool) {
 	// Swap the last index position into the root node.
 	h.xi[1] = h.xi[h.hLen()]
 	// Pare down the list since the last node becam the root
-	h.xi = h.xi[:h.hLen()-1]
+	h.xi = h.xi[:h.hLen()]
 
 	if h.hLen() > 1 {
 		h.bubbleDown(1)
@@ -191,22 +192,25 @@ func (h *heap) bubbleDown(i int) {
 
 	// Find the smaller of the two values between the node at i and i's
 	// two children.
-	min := i
+	minVal := h.xi[i]
+	minIndex := i
+
 	left, prs := h.leftIndex(i)
 	if prs {
-		if h.xi[i] > h.xi[left] {
-			min = left
+		if h.xi[left] < minVal {
+			minIndex = left
+			minVal = h.xi[left]
 		}
 	}
 	r, prs := h.rightIndex(i)
 	if prs {
-		if h.xi[i] > h.xi[r] {
-			min = r
+		if h.xi[r] < minVal {
+			minIndex = r
 		}
 	}
-	if min != i {
-		h.swap(i, min)
-		h.bubbleDown(min)
+	if minIndex != i {
+		h.swap(i, minIndex)
+		h.bubbleDown(minIndex)
 	}
 
 }
