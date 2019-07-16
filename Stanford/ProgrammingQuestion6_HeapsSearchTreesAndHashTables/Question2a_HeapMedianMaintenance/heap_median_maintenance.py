@@ -73,6 +73,7 @@ def rebalance(h_high, h_low):
             root, prs = h_low.extract_root()
             if prs:
                 h_high.insert(root)
+        rebalance(h_high, h_low)
 
 def find_median(h_high, h_low):
     """
