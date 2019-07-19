@@ -24,24 +24,17 @@ class Node:
         self.parent = None
         self.left = None
         self.right = None
-        self.color = "red"
+        self.is_red = True
 
     def recolor(self):
         """
         Switches the color of a Node from red to black or black to red.
         """
 
-        if self.color == "red":
-            self.color = "black"
-        elif self.color == "black":
-            self.color = "red"
-
-    def set_key(self, key):
-        """
-        Changes the value of the key.
-        """
-
-        self.key = key
+        if self.is_red:
+            self.is_red = False
+        else:
+            self.is_red = True
 
     def add_instance(self):
         """
@@ -50,4 +43,28 @@ class Node:
         balancing tree.
         """
 
-        self.instance += 1
+        self.instances += 1
+
+    def remove_instance(self):
+        """
+        Allows for removal of a single instance of a key from the
+        search tree rather than pruning an entire node from the tree.
+        If you want to remove all instances of the node in one go use 
+        the del_node method.
+        """
+
+        self.instances -= 1
+        if self.instances < 1:
+            self.del_node()
+
+    def del_node(self):
+        """
+        Entirely removes a node and all instances from a search tree.
+        """
+
+        self.key = None
+        self.instances = 0
+        self.parent = None
+        self.left = None
+        self.right = None
+        self.color = "red"

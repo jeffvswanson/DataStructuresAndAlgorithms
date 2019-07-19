@@ -1,4 +1,4 @@
-# red_black_binary_search_tree.py
+# red_black_tree.py
 
 import search_tree_node as stn
 
@@ -50,22 +50,26 @@ class RedBlackTree:
             None
         """
 
-        self.root = stn.Node(None)
+        self.root = None
 
     def insert(self, key):
         """
         Inserts a node into the search tree.
 
         Parameters:
-            key : key
-                The key of the node you wish to insert
+            key: The key of the node you wish to insert
         """
         
-        # Search for a node with the value of key in the search tree 
+        new_node = stn.Node(key)
+
+        # Check if there is nothing in the tree
+        if self.root == None:
+            self.root = new_node
+            self.root.recolor()
+            return
 
         # Red-black tree specific
         # If no successor the Node is the root and must be set to black
-        pass
 
     def left_rotation(self, key):
         """
@@ -115,25 +119,28 @@ class RedBlackTree:
 
         pass
 
-    def contains(self, v, n):
+    def contains(self, v) -> Tuple[stn.Node, stn.Node]:
         """
-        Checks if the given value is in the search tree.
+        Checks if the given value is in the search tree. It returns the 
+        last node accessed
 
         Parameters:
             v: The value you wish to check for.
-            n: The comparison node.
 
         Returns:
-            key: The value of the key if the search tree contains it, otherwise 0.
-            bool: True if the search tree contains key, otherwise False.
+            node: The node the search ended on whether a null node or 
+                an actual node.
+            node: The last node accessed (parent or potential parent).
         """
 
-        if n == None or n.key == None:
-            return None, False
-        if v < n.key:
-            return self.contains(v, n.left)
-        elif v > n.key:
-            return self.contains(v, n.right)
-        else:
-            return v, True
+        current_node, parent = self.root, self.root
+
+        while current_node != None and v != current_node.key:
+            parent = current_node
+            if v < current_node.key:
+                current_node = current_node.left
+            else:
+                current_node = current_node.right   
+
+        return current_node, parent
    

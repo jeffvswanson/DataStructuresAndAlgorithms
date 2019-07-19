@@ -11,7 +11,7 @@ class TestSearchTreeNode(unittest.TestCase):
         
     def test_recolor(self):
         self.node.recolor()
-        self.assertEqual(self.node.color, "black", "wrong color after recolor")
+        self.assertFalse(self.node.is_red, "wrong color after recolor")
 
     def test_set_key(self):
         self.node.set_key(0)
@@ -20,6 +20,13 @@ class TestSearchTreeNode(unittest.TestCase):
 
     def test_add_instance(self):
         self.node.add_instance()
+        want = 2
+        self.assertEqual(self.node.instances, want, "number of node occurrences not updated")
+
+    def test_remove_instance(self):
+        self.node.add_instance()
+        self.node.add_instance()
+        self.node.remove_instance()
         want = 2
         self.assertEqual(self.node.instances, want, "number of node occurrences not updated")
 
