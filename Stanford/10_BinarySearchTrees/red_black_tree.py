@@ -62,23 +62,58 @@ class RedBlackTree:
         
         new_node = stn.Node(key)
 
-        # Check if there is nothing in the tree
+        # Check if there is nothing in the tree.
         if self.root == None:
             self.root = new_node
+            # Paint it black.
             self.root.recolor()
             return
 
-        # Red-black tree specific
-        # If no successor the Node is the root and must be set to black
+        # Find where the node should be inserted.
+        found_node, parent = self.contains(new_node.key)
+        
+        if new_node.key != parent.key:
+            if new_node.key < parent.key:
+                parent.left = new_node
+            else: # new_node.key > parent.key
+                parent.right = new_node
+            self.rebalance(new_node)
+        else:
+            found_node.add_instance()
 
-    def left_rotation(self, key):
+    def rebalance(self, node):
         """
+        Ensures the search tree remains balanced.
         """
 
-        pass
+        pass    
 
-    def right_rotation(self, key):
+    def left_rotation(self, node):
         """
+        Conducts a left rotation causing the given node to move left down the 
+        tree and brings its right child into the vacated position.
+
+          A      left         C
+         /\\  ---------->    /
+        B   C  rotation     A
+                of A       /
+                          B               
+        """
+
+        # Adjust the pointers for the nodes.
+        new_parent = node.right
+
+
+    def right_rotation(self, node):
+        """
+        Conducts a right rotation causing the given node to move right down the
+        tree and brings its left child into the vacated position. 
+
+          A     right       B
+         /\\  ---------->   \\
+        B   C  rotation       A
+                of A          \\
+                                C                                   
         """
 
         pass
@@ -91,33 +126,62 @@ class RedBlackTree:
 
     def traverse(self):
         """
+        Prints keys in increasing order.
         """
         
         pass
 
     def successor(self, key):
         """
+        Computes the next greater value in the search tree. If no successor is found,
+        the key is a maximum.
+
+        Returns: 
+            node.key: The successor node's value.
         """
 
         pass
 
     def predecessor(self, key):
         """
+        Computes the next least value in the search tree. If no predecessor is found,
+        the key is a minimum.
+
+        Returns:
+            node.key: The predecessor node's value.
         """
 
         pass
 
-    def max(self):
+    def max(self) -> stn.Node.key:
         """
+        Computes the maximum value in the search tree.
+
+        Returns:
+            node.key: The maximum node's value.
         """
 
-        pass
+        max_node = self.root
 
-    def min(self):
+        while max_node != None:
+            max_node = max_node.right
+
+        return max_node.key
+
+    def min(self) -> stn.Node.key:
         """
+        Computes the minimum value in the search tree.
+
+        Returns:
+            node.key: The minimum node's value.
         """
 
-        pass
+        min_node = self.root
+
+        while min_node != None:
+            min_node = min_node.left
+
+        return min_node.key
 
     def contains(self, v) -> Tuple[stn.Node, stn.Node]:
         """

@@ -44,5 +44,24 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
         self.assertEqual(self.tree.root.right, want.right, "root node's right child not None")
         self.assertEqual(self.tree.root.is_red, want.is_red, "root node not colored black")
 
+
+    def test_max(self):
+
+        # Test for max in empty tree
+        # Test for max with only root node
+        # Test for max with all values less than root node
+        # Test for max with all values greater than root node
+        # Test for max in tree with values less than and greater than root node
+        pass
+
+    def test_min(self):
+
+        # Test for min in empty tree
+        # Test for min with only root node
+        # Test for min with all values less than root node
+        # Test for min with all values greater than root node
+        # Test for min in tree with values less than and greater than root node
+        pass
+
 if __name__ == "__main__":
     unittest.main()
