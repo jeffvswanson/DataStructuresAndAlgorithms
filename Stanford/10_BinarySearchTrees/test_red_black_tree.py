@@ -81,5 +81,48 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
         # Test for original node as non-root and a right child
         pass
 
+    def test_rebalance(self):
+        pass
+
+    def test_insert(self):
+
+        # Test insert to an empty tree
+        # Test insert value less than root
+        # Test insert value greater than root
+        # Test insert duplicate value
+        pass
+
+    def test_case1(self):
+
+        # Test to ensure colors get changed, not worried about red-black
+        # maintenance
+        pass
+
+    def test_case2(self):
+
+        # Test to ensure rotations occur and colors are changes, not
+        # worried about red-black maintenance
+        pass
+
+    def test_traverse(self):
+
+        # Test default with root node traversal
+        # Test a subtree traversal, that is, not starting at root node
+        pass
+
+    def test_successor(self):
+
+        # Test easy case
+        # Test other case
+        # Test key not in search tree
+        pass
+
+    def test_predecessor(self):
+
+        # Test easy case
+        # Test other case
+        # Test key not in search tree
+        pass
+
 if __name__ == "__main__":
     unittest.main()

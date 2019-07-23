@@ -57,7 +57,7 @@ class RedBlackTree:
         Inserts a node into the search tree.
 
         Parameters:
-            key: The key of the node you wish to insert
+            key: The key of the node you wish to insert.
         """
         
         new_node = stn.Node(key)
@@ -80,13 +80,77 @@ class RedBlackTree:
             self.rebalance(new_node)
         else:
             found_node.add_instance()
+        
+        self.rebalance(new_node)
 
     def rebalance(self, node):
         """
         Ensures the search tree remains balanced.
+
+        Parameters:
+            node: The node where rebalancing should start.
         """
 
-        pass    
+        # Easy case: node's parent is black.
+        if node != self.root and not node.parent.is_red:
+            return
+        
+        # Now we have to keep propagating changes up the tree since
+        # node's parent is red and there cannot be two reds in a 
+        # parent-child relationship.
+        while node.parent.is_red and node != self.root:
+
+            grandparent = node.parent.parent
+
+            # Determine the rebalancing case
+            if grandparent.right.is_red and grandparent.left.is_red:
+                self.case1(node)
+            else:
+                self.case2(node)
+        
+        # After propagating ensure the root of the tree remains black.
+        if self.root.is_red:
+            self.root.recolor()
+
+    def case1(self, node):
+        """
+        The parent of the node and the parent's sibling are red.
+
+        Leave node as red. The grandparent of red must be black since
+        the parent of node is originally red. Color the grandparent of 
+        node red and the grandparent's left and right children black.
+
+        Parameters:
+            node: The node originating the first case of node reorganization.
+        """
+
+        grandparent = node.parent.parent
+        grandparent.recolor()
+
+        grandparent.left.recolor()
+        grandparent.right.recolor()
+
+    def case2(self, node):
+        """
+        The parent of the node is red and the parent's sibling is black or None.
+
+        Rotate node's parent in the opposite direction of node so node
+        occupies the original parent's position. Then recolor node and
+        node's new parent.
+
+        Parameters:
+            node: The node originating the second case of node reorganization.
+        """
+
+        # Figure out which way to rotate.
+        if node == node.parent.right:
+            self.left_rotation(node.parent)
+        else:
+            self.right_rotation(node.parent)
+        
+        # Recolor node and the new parent of node after rotation.
+        node.recolor()
+        node.parent.recolor()        
 
     def left_rotation(self, node):
         """
@@ -97,7 +161,10 @@ class RedBlackTree:
          /\\  ---------->    /
         B   C  rotation     A
                 of A       /
-                          B               
+                          B
+
+        Parameters:
+            node: The parent node to rotate out of position.
         """
 
         # Adjust the child pointers for the nodes due to the rotation.
@@ -135,7 +202,10 @@ class RedBlackTree:
          /\\  ---------->   \\
         B   C  rotation       A
                 of A          \\
-                                C                                   
+                                C
+
+        Parameters:
+            node: The parent node to rotate out of position.               
         """
 
         # Adjust the child pointers for the nodes due to the rotation.
@@ -166,16 +236,30 @@ class RedBlackTree:
 
     def delete(self, key):
         """
+        Parameters:
+            key: The key of the node you wish to delete from the search tree.
         """
 
         pass
 
-    def traverse(self):
+    def traverse(self, node=self.root) -> list:
         """
-        Prints keys in increasing order.
+        Provides keys in increasing order.
+
+        Parameters:
+            node: The node the in-order traversal will start from.
+
+        Returns:
+            list: A list of the tree's keys in ascending order.
         """
         
-        pass
+        tree = []
+        if node != None:
+            tree = self.traverse(node.left)
+            tree.append(node.key)
+            tree = tree + self.traverse(node.right)
+
+        return tree
 
     def successor(self, key) -> stn.Node.key:
         """
