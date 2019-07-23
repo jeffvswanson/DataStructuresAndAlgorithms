@@ -100,9 +100,31 @@ class RedBlackTree:
                           B               
         """
 
-        # Adjust the pointers for the nodes.
+        # Adjust the child pointers for the nodes due to the rotation.
+        # The node's right child will become the node's parent with 
+        # a left rotation
         new_parent = node.right
 
+        # Since the new_parent is greater than node, the new_parent's 
+        # left pointer will adjust to point to node and node's right 
+        # pointer must be adjusted to point to the soon-to-be orphaned 
+        # left node of new_parent.
+        node.right = new_parent.left
+        if new_parent.left != None:
+            new_parent.left.parent = node
+        
+        # Adjust the parent pointers for the nodes due to the rotation.
+        if node.parent == None:
+            self.root = new_parent
+        else:
+            new_parent.parent = node.parent
+            if node == node.parent.left:
+                node.parent.left = new_parent
+            else:
+                node.parent.right = new_parent
+
+        new_parent.left = node
+        node.parent = new_parent
 
     def right_rotation(self, node):
         """
@@ -116,7 +138,31 @@ class RedBlackTree:
                                 C                                   
         """
 
-        pass
+        # Adjust the child pointers for the nodes due to the rotation.
+        # The node's left child will become the node's parent with
+        # a right rotation.
+        new_parent = node.left
+
+        # Since the new_parent is less than node, the new_parent's
+        # right pointer will adjust to point to node and node's left
+        # pointer must be adjusted to point to the soon-to-be orphaned
+        # right node of new_parent.
+        node.left = new_parent.right
+        if new_parent.right != None:
+            new_parent.right.parent = node
+
+        # Adjust the parent pointers for the nodes due to the rotation.
+        if node.parent == None:
+            self.root = new_parent
+        else:
+            new_parent.parent = node.parent
+            if node == node.parent.left:
+                node.parent.left = new_parent
+            else: 
+                node.parent.right = new_parent
+            
+        new_parent.right = node
+        node.parent = new_parent
 
     def delete(self, key):
         """
@@ -131,7 +177,7 @@ class RedBlackTree:
         
         pass
 
-    def successor(self, key):
+    def successor(self, key) -> stn.Node.key:
         """
         Computes the next greater value in the search tree. If no successor is found,
         the key is a maximum.
@@ -140,9 +186,17 @@ class RedBlackTree:
             node.key: The successor node's value.
         """
 
+        # Easy Case: If the key in question's right subtree is not empty, 
+        # return the min key in the right subtree.
+
+        # Otherwise, Follow parent pointers of the key in question until you
+        # get to a key value greater than the original key. If you reach the 
+        # root and have not found a key greater than the original key, then
+        # there is no successor in the search tree and the original key is 
+        # the maximum key.
         pass
 
-    def predecessor(self, key):
+    def predecessor(self, key) -> stn.Node.key:
         """
         Computes the next least value in the search tree. If no predecessor is found,
         the key is a minimum.
@@ -151,6 +205,14 @@ class RedBlackTree:
             node.key: The predecessor node's value.
         """
 
+        # Easy Case: If the key in question's left subtree is not empty, return 
+        # the max key in the left subtree.
+
+        # Otherwise: Follow parent pointers of the key in question until you 
+        # get to a key value less than the original key. If you reach the root
+        # and have not found a key less than the original key, then there is 
+        # no predecessor in the search tree and the original key is the 
+        # minimum key.
         pass
 
     def max(self) -> stn.Node.key:

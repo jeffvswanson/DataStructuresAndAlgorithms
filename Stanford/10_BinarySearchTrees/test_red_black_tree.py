@@ -63,5 +63,23 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
         # Test for min in tree with values less than and greater than root node
         pass
 
+    def test_left_rotation(self):
+
+        # Test for new_parent with empty left subtree
+        # Test for new_parent with non-empty left subtree
+        # Test for original node as root
+        # Test for original node as non-root and a left child
+        # Test for original node as non-root and a right child
+        pass
+
+    def test_right_rotation(self):
+
+        # Test for new_parent with empty right subtree
+        # Test for new_parent with non-empty right subtree
+        # Test for original node as root
+        # Test for original node as non-root and a left child
+        # Test for original node as non-root and a right child
+        pass
+
 if __name__ == "__main__":
     unittest.main()
