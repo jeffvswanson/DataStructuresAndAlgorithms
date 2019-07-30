@@ -1,4 +1,4 @@
-# search_tree_node.py
+# red_black_node.py
 
 class Node:
     """
@@ -7,9 +7,11 @@ class Node:
     Attributes:
         key: The key is the value the node shall be sorted on. The key can be an integer,
             float, string, anything capable of being sorted.
-        left: The pointer to the left child node.
-        right: The pointer to the right child node.
-        color (str): The color attribute keeps track of whether a node is red or black.
+        instances (int): The number of times the key for a node was inserted into the tree.
+        parent (node): The pointer to the parent of the node.
+        left (node): The pointer to the left child node.
+        right (node): The pointer to the right child node.
+        is_red (bool): The color attribute keeps track of whether a node is red or black.
     """
 
     def __init__(self, key):
@@ -49,17 +51,13 @@ class Node:
         """
         Allows for removal of a single instance of a key from the
         search tree rather than pruning an entire node from the tree.
-        If you want to remove all instances of the node in one go use 
-        the del_node method.
         """
 
         self.instances -= 1
-        if self.instances < 1:
-            self.del_node()
 
-    def del_node(self):
+    def delete(self):
         """
-        Entirely removes a node and all instances from a search tree.
+        Zeroes out a node for deletion.
         """
 
         self.key = None
@@ -67,4 +65,4 @@ class Node:
         self.parent = None
         self.left = None
         self.right = None
-        self.color = "red"
+        self.is_red = True
