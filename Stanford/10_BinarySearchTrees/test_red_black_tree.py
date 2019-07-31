@@ -87,10 +87,20 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
     def test_insert(self):
 
         # Test insert to an empty tree
+        self.tree.insert(0)
+        expected = rbn.Node(0)
+        expected.recolor()
+        self.assertEqual(self.tree.root.key, expected.key, "insert into empty tree failed, keys not equal")
+        self.assertEqual(self.tree.root.instances, expected.instances, "insert into empty tree failed, instances not equal")
+        self.assertEqual(self.tree.root.parent, expected.parent, "insert in to empty tree failed, parent pointers not equal")
+        self.assertEqual(self.tree.root.left, expected.left, "insert into empty tree failed, left pointers not None")
+        self.assertEqual(self.tree.root.right, expected.right, "insert into empty tree failed, right pointer not None")
+        self.assertFalse(self.tree.root.is_red, "insert root into empty tree failed, root should be black not red")
         # Test insert value less than root
+        self.tree.insert(-1)
+        self.assertEqual(self.tree.root.left.key, -1, "insert a smaller element into ")
         # Test insert value greater than root
         # Test insert duplicate value
-        pass
 
     def test_case1(self):
 

@@ -14,11 +14,11 @@ class RedBlackTree:
     Methods:
         insert(key: key)
             Inserts an element into the search tree.
-        left_rotation(key)
+        _left_rotation(key)
             Reorganizes a section of the search tree so the parent node, x, 
             becomes the left child of it's original right child, y, and y 
             becomes the parent of x.
-        right_rotation(key)
+        _right_rotation(key)
             Reorganizes a section of the search tree so the parent node, x,
             becomes the right child of its original left child, y, and y
             becomes the parent of x.
@@ -60,6 +60,9 @@ class RedBlackTree:
             key: The key of the node you wish to insert.
         """
         
+        if key == None:
+            return
+
         new_node = rbn.Node(key)
 
         # Check if there is nothing in the tree.
@@ -349,7 +352,7 @@ class RedBlackTree:
                     s.parent.recolor() # s.parent is black
                 self._left_rotation(s.parent)
 
-    def traverse(self, node=self.root) -> list:
+    def traverse(self, node=None) -> list:
         """
         Provides keys in increasing order.
 
@@ -359,6 +362,9 @@ class RedBlackTree:
         Returns:
             list: A list of the tree's keys in ascending order.
         """
+
+        if node == None:
+            node = self.root
         
         tree = []
         if node != None:
@@ -368,7 +374,7 @@ class RedBlackTree:
 
         return tree
 
-    def successor(self, key) -> rbn.Node.key:
+    def successor(self, key) -> rbn.Node:
         """
         Computes the next greater value in the search tree. If no successor is found,
         the key is a maximum.
@@ -387,7 +393,7 @@ class RedBlackTree:
         # the maximum key.
         pass
 
-    def predecessor(self, key) -> rbn.Node.key:
+    def predecessor(self, key) -> rbn.Node:
         """
         Computes the next least value in the search tree. If no predecessor is found,
         the key is a minimum.
@@ -406,7 +412,7 @@ class RedBlackTree:
         # minimum key.
         pass
 
-    def max(self) -> rbn.Node.key:
+    def max(self) -> rbn.Node:
         """
         Computes the maximum value in the search tree.
 
@@ -421,7 +427,7 @@ class RedBlackTree:
 
         return max_node.key
 
-    def min(self) -> rbn.Node.key:
+    def min(self) -> rbn.Node:
         """
         Computes the minimum value in the search tree.
 
