@@ -3,7 +3,7 @@
 import unittest
 
 import red_black_tree as rb
-import search_tree_node as stn
+import red_black_node as rbn
 
 class TestRedBlackBinarySearchTree(unittest.TestCase):
 
@@ -12,22 +12,22 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
 
     def test_contains(self):
 
-        search_value = stn.Node(0)
+        search_value = rbn.Node(0)
 
         # Test for match
-        self.tree.root = stn.Node(0)
+        self.tree.root = rbn.Node(0)
         got = self.tree.contains(search_value.key)
         want = (search_value.key, search_value.key)
         self.assertTupleEqual((got[0].key, got[1].key), want)
 
         # Test for value less than comparison node, also tests no match
-        self.tree.root = stn.Node(1)
+        self.tree.root = rbn.Node(1)
         got = self.tree.contains(search_value.key)
         want = (None, self.tree.root.key)
         self.assertEqual((got[0], got[1].key), want)
 
         # Test for value greater than comparison node
-        self.tree.root = stn.Node(-1)
+        self.tree.root = rbn.Node(-1)
         got = self.tree.contains(search_value.key)
         want = (None, self.tree.root.key)
         self.assertTupleEqual((got[0], got[1].key), want)
@@ -35,7 +35,7 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
     def test_insert_empty_tree(self):
 
         self.tree.insert(1)
-        want = stn.Node(1)
+        want = rbn.Node(1)
         want.recolor()
         self.assertEqual(self.tree.root.key, want.key, "initialized root has incorrect key value")
         self.assertEqual(self.tree.root.instances, want.instances, "initialized root has incorrect number of instances")
@@ -122,6 +122,20 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
         # Test easy case
         # Test other case
         # Test key not in search tree
+        pass
+
+    def test_delete_instance(self):
+
+        # Test no nodes in tree
+        # Test removing one instance
+        # Test removing a second instance
+        # Test removing a node so the instances go to 0
+        pass
+
+    def test_delete(self):
+
+        # Test no nodes in tree
+        # Test removing a node for each case
         pass
 
 if __name__ == "__main__":

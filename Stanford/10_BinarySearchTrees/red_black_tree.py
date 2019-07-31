@@ -1,6 +1,6 @@
 # red_black_tree.py
 
-import search_tree_node as stn
+import red_black_node as rbn
 
 from typing import Tuple
 
@@ -60,7 +60,7 @@ class RedBlackTree:
             key: The key of the node you wish to insert.
         """
         
-        new_node = stn.Node(key)
+        new_node = rbn.Node(key)
 
         # Check if there is nothing in the tree.
         if self.root == None:
@@ -77,13 +77,12 @@ class RedBlackTree:
                 parent.left = new_node
             else: # new_node.key > parent.key
                 parent.right = new_node
-            self.rebalance(new_node)
         else:
             found_node.add_instance()
         
         self.rebalance(new_node)
 
-    def rebalance(self, node):
+    def _rebalance(self, node):
         """
         Ensures the search tree remains balanced.
 
@@ -104,15 +103,15 @@ class RedBlackTree:
 
             # Determine the rebalancing case
             if grandparent.right.is_red and grandparent.left.is_red:
-                self.case1(node)
+                self._case1(node)
             else:
-                self.case2(node)
+                self._case2(node)
         
         # After propagating ensure the root of the tree remains black.
         if self.root.is_red:
             self.root.recolor()
 
-    def case1(self, node):
+    def _case1(self, node):
         """
         The parent of the node and the parent's sibling are red.
 
@@ -130,7 +129,7 @@ class RedBlackTree:
         grandparent.left.recolor()
         grandparent.right.recolor()
 
-    def case2(self, node):
+    def _case2(self, node):
         """
         The parent of the node is red and the parent's sibling is black or None.
 
@@ -144,15 +143,15 @@ class RedBlackTree:
 
         # Figure out which way to rotate.
         if node == node.parent.right:
-            self.left_rotation(node.parent)
+            self._left_rotation(node.parent)
         else:
-            self.right_rotation(node.parent)
+            self._right_rotation(node.parent)
         
         # Recolor node and the new parent of node after rotation.
         node.recolor()
         node.parent.recolor()        
 
-    def left_rotation(self, node):
+    def _left_rotation(self, node):
         """
         Conducts a left rotation causing the given node to move left down the 
         tree and brings its right child into the vacated position.
@@ -193,7 +192,7 @@ class RedBlackTree:
         new_parent.left = node
         node.parent = new_parent
 
-    def right_rotation(self, node):
+    def _right_rotation(self, node):
         """
         Conducts a right rotation causing the given node to move right down the
         tree and brings its left child into the vacated position. 
@@ -234,13 +233,121 @@ class RedBlackTree:
         new_parent.right = node
         node.parent = new_parent
 
+    def delete_instance(self, key):
+        """
+        Deletes an instance of a node in the red-black search tree. That is, if there
+        is more than one instance delete_instance decrements the number of instances
+        of the node. If this method is called when only one instance exists the
+        delete method gets called to completely remove the node from the search
+        tree.
+
+        Parameters:
+            key: The key of the node you wish to delete an instance of.
+        """
+
+        node, _ = self.contains(key)
+
+        if node == None:
+            return
+        else:
+            node.remove_instance()
+            if node.instances < 1:
+                self.delete(key)
+
     def delete(self, key):
         """
+        Completely removes a node from a red-black search tree regardless of the 
+        number of instances the node possesses.
+
         Parameters:
             key: The key of the node you wish to delete from the search tree.
         """
+        
+        node, parent = self.contains(key)
+        
+        if node == None:
+            return
+        
+        # Case 1: node is red with no children
+        if node.is_red and node.left == None and node.right == None:
+            if parent.left == node:
+                parent.left = None
+            else:
+                parent.right = None
 
-        pass
+        # Case 2: node is black, node has only one child, and the child is red
+        # As a side note, there is no case for a node possessing only one 
+        # black child as that would not be a valid tree structure.
+        if node.left != None and node.left.is_red and node.right == None:
+            if parent.left == node:
+                parent.left = node.left
+                parent.left.recolor()
+            else:
+                parent.right = node.left
+                parent.right.recolor()
+        elif node.right != None and node.right.is_red and node.left == None:
+            if parent.right == node:
+                parent.right = node.right
+                parent.right.recolor()
+            else:
+                parent.left = node.right
+                parent.right.recolor()
+
+        # Case 3: node is black
+        if not node.is_red:
+            self.case3(node)
+        
+        node.delete()
+
+    def _case3(self, node):
+        """
+        Case 3 occurs when the node we want to delete is a black node.
+
+        Since deleting a black node would alter the requirement to have
+        the same number of black nodes regardless of the path taken
+        the tree must be adjusted.
+
+        Parameters:
+            node: The node originating the case 3 deletion.
+        """
+
+        parent = node.parent
+
+        if parent.right == node:
+                s = parent.left
+        else: 
+            s = parent.right
+        # Case 3.1: node's sibling, s, is red
+        if s.is_red:
+            parent.recolor()
+            s.recolor()
+            if s == parent.left:
+                self._right_rotation(parent)
+            else:
+                self._left_rotation(parent)         
+        else: # node's sibling, s, is black
+            # Case 3.2: Both children of s are black
+            if not (s.left.is_red and s.right.is_red):
+                s.recolor()
+                if parent.is_red:
+                    parent.recolor()
+                    return
+                else:
+                    # Defaults to case 3.1 on the next pass-through.
+                    self._case3(parent)
+
+            # Case 3.3: s's left child is red
+            elif s.left.is_red and not s.right.is_red:
+                s.recolor() # s is red
+                s.left.is_red.recolor() # s.left is black
+                self._right_rotation(s) # sets us up for case 3.4
+
+            # Case 3.4: s's right child is red
+            elif s.right.is_red:
+                s.right.recolor() # s.right is black
+                if parent.is_red:
+                    s.parent.recolor() # s.parent is black
+                self._left_rotation(s.parent)
 
     def traverse(self, node=self.root) -> list:
         """
@@ -261,7 +368,7 @@ class RedBlackTree:
 
         return tree
 
-    def successor(self, key) -> stn.Node.key:
+    def successor(self, key) -> rbn.Node.key:
         """
         Computes the next greater value in the search tree. If no successor is found,
         the key is a maximum.
@@ -280,7 +387,7 @@ class RedBlackTree:
         # the maximum key.
         pass
 
-    def predecessor(self, key) -> stn.Node.key:
+    def predecessor(self, key) -> rbn.Node.key:
         """
         Computes the next least value in the search tree. If no predecessor is found,
         the key is a minimum.
@@ -299,7 +406,7 @@ class RedBlackTree:
         # minimum key.
         pass
 
-    def max(self) -> stn.Node.key:
+    def max(self) -> rbn.Node.key:
         """
         Computes the maximum value in the search tree.
 
@@ -314,7 +421,7 @@ class RedBlackTree:
 
         return max_node.key
 
-    def min(self) -> stn.Node.key:
+    def min(self) -> rbn.Node.key:
         """
         Computes the minimum value in the search tree.
 
@@ -329,7 +436,7 @@ class RedBlackTree:
 
         return min_node.key
 
-    def contains(self, v) -> Tuple[stn.Node, stn.Node]:
+    def contains(self, v) -> Tuple[rbn.Node, rbn.Node]:
         """
         Checks if the given value is in the search tree. It returns the 
         last node accessed
