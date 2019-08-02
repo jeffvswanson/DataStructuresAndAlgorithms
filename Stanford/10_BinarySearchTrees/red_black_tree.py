@@ -75,15 +75,15 @@ class RedBlackTree:
         # Find where the node should be inserted.
         found_node, parent = self.contains(new_node.key)
         
-        if new_node.key != parent.key:
+        if found_node != None:
+            found_node.add_instance()
+        elif new_node.key != parent.key:
+            new_node.parent = parent
             if new_node.key < parent.key:
                 parent.left = new_node
             else: # new_node.key > parent.key
                 parent.right = new_node
-        else:
-            found_node.add_instance()
-        
-        self.rebalance(new_node)
+            self._rebalance(new_node)
 
     def _rebalance(self, node):
         """
