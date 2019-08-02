@@ -41,7 +41,6 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
 
         # Test for max with only root node
         self.tree.insert(0)
-        self.assertFalse(self.tree.root.is_red, "root not correct")
         got = self.tree.max()
         want = 0
         self.assertEqual(got.key, want, "max failed with only root node")
@@ -72,11 +71,38 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
     def test_min(self):
 
         # Test for min in empty tree
+        got = self.tree.min()
+        want = None
+        self.assertEqual(got, want, "min failed on empty tree, should be None")
+
         # Test for min with only root node
+        self.tree.insert(0)
+        got = self.tree.min()
+        want = 0
+        self.assertEqual(got.key, want, "min failed with only root node")
+
         # Test for min with all values less than root node
+        self.tree.insert(-1)
+        self.tree.insert(-2)
+        got = self.tree.min()
+        want = -2
+        self.assertEqual(got.key, want, "min failed with all values less than original root node")
+
         # Test for min with all values greater than root node
+        self.tree = rb.RedBlackTree()
+        self.tree.insert(0)
+        self.tree.insert(1)
+        self.tree.insert(2)
+        got = self.tree.min()
+        want = 0
+        self.assertEqual(got.key, want, "min failed with all values greater than original root node")
+
         # Test for min in tree with values less than and greater than root node
-        pass
+        self.tree.insert(-1)
+        self.tree.insert(-2)
+        got = self.tree.min()
+        want = -2
+        self.assertEqual(got.key, want, "min failed with values greater and less than original root node")
 
     def test_left_rotation(self):
 

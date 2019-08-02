@@ -452,7 +452,8 @@ class RedBlackTree:
 
         min_node = self.root
 
-        while min_node != None:
+        
+        while min_node != None and min_node.left != None:
             min_node = min_node.left
 
         return min_node
