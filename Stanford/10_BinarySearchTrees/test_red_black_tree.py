@@ -32,19 +32,6 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
         want = (None, self.tree.root.key)
         self.assertTupleEqual((got[0], got[1].key), want)
 
-    def test_insert_empty_tree(self):
-
-        self.tree.insert(1)
-        want = rbn.Node(1)
-        want.recolor()
-        self.assertEqual(self.tree.root.key, want.key, "initialized root has incorrect key value")
-        self.assertEqual(self.tree.root.instances, want.instances, "initialized root has incorrect number of instances")
-        self.assertEqual(self.tree.root.parent, want.parent, "root parent not None")
-        self.assertEqual(self.tree.root.left, want.left, "root node's left child not None")
-        self.assertEqual(self.tree.root.right, want.right, "root node's right child not None")
-        self.assertEqual(self.tree.root.is_red, want.is_red, "root node not colored black")
-
-
     def test_max(self):
 
         # Test for max in empty tree
@@ -88,19 +75,26 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
 
         # Test insert to an empty tree
         self.tree.insert(0)
-        expected = rbn.Node(0)
-        expected.recolor()
-        self.assertEqual(self.tree.root.key, expected.key, "insert into empty tree failed, keys not equal")
-        self.assertEqual(self.tree.root.instances, expected.instances, "insert into empty tree failed, instances not equal")
-        self.assertEqual(self.tree.root.parent, expected.parent, "insert in to empty tree failed, parent pointers not equal")
-        self.assertEqual(self.tree.root.left, expected.left, "insert into empty tree failed, left pointers not None")
-        self.assertEqual(self.tree.root.right, expected.right, "insert into empty tree failed, right pointer not None")
+        want = rbn.Node(0)
+        want.recolor()
+        self.assertEqual(self.tree.root.key, want.key, "insert into empty tree failed, keys not equal")
+        self.assertEqual(self.tree.root.instances, want.instances, "insert into empty tree failed, instances not equal")
+        self.assertEqual(self.tree.root.parent, want.parent, "insert in to empty tree failed, parent pointers not equal")
+        self.assertEqual(self.tree.root.left, want.left, "insert into empty tree failed, left child should be None")
+        self.assertEqual(self.tree.root.right, want.right, "insert into empty tree failed, right child should be None")
         self.assertFalse(self.tree.root.is_red, "insert root into empty tree failed, root should be black not red")
         # Test insert value less than root
         self.tree.insert(-1)
-        self.assertEqual(self.tree.root.left.key, -1, "insert a smaller element into ")
+        self.assertEqual(self.tree.root.left.key, -1, "inserting a smaller element into the tree failed")
+        self.assertEqual(self.tree.root.key, self.tree.root.left.parent.key, "left child's parent not correct")
         # Test insert value greater than root
+        self.tree.insert(1)
+        self.assertEqual(self.tree.root.right.key, 1, "inserting a larger element into the tree failed")
+        self.assertEqual(self.tree.root.key, self.tree.root.right.parent.key, "right child's parent not correct")
         # Test insert duplicate value
+        self.tree.insert(1)
+        want = 2
+        self.assertEqual(self.tree.root.right.instances, want, "inserting a duplicate value failed")
 
     def test_case1(self):
 
