@@ -35,11 +35,39 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
     def test_max(self):
 
         # Test for max in empty tree
+        got = self.tree.max()
+        want = None
+        self.assertEqual(got, want, "max failed on empty tree, should be None")
+
         # Test for max with only root node
+        self.tree.insert(0)
+        self.assertFalse(self.tree.root.is_red, "root not correct")
+        got = self.tree.max()
+        want = 0
+        self.assertEqual(got.key, want, "max failed with only root node")
+
         # Test for max with all values less than root node
+        self.tree.insert(-1)
+        self.tree.insert(-2)
+        got = self.tree.max()
+        self.assertEqual(got.key, want, "max failed with all values less than root node")
+
         # Test for max with all values greater than root node
+        self.tree = rb.RedBlackTree()
+        self.tree.insert(0)
+        self.tree.insert(1)
+        self.tree.insert(2)
+        got = self.tree.max()
+        want = 2
+        self.assertEqual(got.key, want, "max failed with all values greater than root node")
+
         # Test for max in tree with values less than and greater than root node
-        pass
+        self.tree.insert(-1)
+        self.tree.insert(-2)
+        self.tree.insert(3)
+        got = self.tree.max()
+        want = 3
+        self.assertEqual(got.key, want, "max failed with values greater and less than root node")
 
     def test_min(self):
 
@@ -83,14 +111,17 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
         self.assertEqual(self.tree.root.left, want.left, "insert into empty tree failed, left child should be None")
         self.assertEqual(self.tree.root.right, want.right, "insert into empty tree failed, right child should be None")
         self.assertFalse(self.tree.root.is_red, "insert root into empty tree failed, root should be black not red")
+
         # Test insert value less than root
         self.tree.insert(-1)
         self.assertEqual(self.tree.root.left.key, -1, "inserting a smaller element into the tree failed")
         self.assertEqual(self.tree.root.key, self.tree.root.left.parent.key, "left child's parent not correct")
+
         # Test insert value greater than root
         self.tree.insert(1)
         self.assertEqual(self.tree.root.right.key, 1, "inserting a larger element into the tree failed")
         self.assertEqual(self.tree.root.key, self.tree.root.right.parent.key, "right child's parent not correct")
+
         # Test insert duplicate value
         self.tree.insert(1)
         want = 2

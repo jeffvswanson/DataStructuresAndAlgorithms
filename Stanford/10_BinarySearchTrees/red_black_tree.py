@@ -105,10 +105,18 @@ class RedBlackTree:
             grandparent = node.parent.parent
 
             # Determine the rebalancing case
-            if grandparent.right.is_red and grandparent.left.is_red:
+            if grandparent.right == None or grandparent.left == None:
+                self._case2(node)
+            elif grandparent.right.is_red and grandparent.left.is_red:
                 self._case1(node)
             else:
                 self._case2(node)
+
+            # Do not continue, the root does not have a grandparent.
+            if node.parent == self.root:
+                break
+            else:
+                node = node.parent
         
         # After propagating ensure the root of the tree remains black.
         if self.root.is_red:
@@ -185,6 +193,9 @@ class RedBlackTree:
         # Adjust the parent pointers for the nodes due to the rotation.
         if node.parent == None:
             self.root = new_parent
+            # Paint it black
+            if self.root.is_red:
+                self.root.recolor()
         else:
             new_parent.parent = node.parent
             if node == node.parent.left:
@@ -226,6 +237,9 @@ class RedBlackTree:
         # Adjust the parent pointers for the nodes due to the rotation.
         if node.parent == None:
             self.root = new_parent
+            # Paint it black
+            if self.root.is_red:
+                self.root.recolor()
         else:
             new_parent.parent = node.parent
             if node == node.parent.left:
@@ -422,10 +436,11 @@ class RedBlackTree:
 
         max_node = self.root
 
-        while max_node != None:
-            max_node = max_node.right
+        if max_node != None:
+            while max_node.right != None:
+                max_node = max_node.right
 
-        return max_node.key
+        return max_node
 
     def min(self) -> rbn.Node:
         """
@@ -440,7 +455,7 @@ class RedBlackTree:
         while min_node != None:
             min_node = min_node.left
 
-        return min_node.key
+        return min_node
 
     def contains(self, v) -> Tuple[rbn.Node, rbn.Node]:
         """
