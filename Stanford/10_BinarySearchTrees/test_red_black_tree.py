@@ -106,7 +106,13 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
 
     def test_left_rotation(self):
 
-        # Test for new_parent with empty left subtree
+        # Test for left rotation by inserting two values greater than root node
+        self.tree.insert(0)
+        self.tree.insert(1)
+        self.tree.insert(2)
+        got = self.tree.root
+        want = 1
+        self.assertEqual(got.key, want, "_left_rotation failed, root incorrect")
         # Test for new_parent with non-empty left subtree
         # Test for original node as root
         # Test for original node as non-root and a left child
