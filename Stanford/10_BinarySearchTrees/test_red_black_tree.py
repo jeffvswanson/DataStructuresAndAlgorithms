@@ -182,7 +182,14 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
 
         # Test to ensure colors get changed, not worried about red-black.
         # maintenance
-        pass
+        self.tree.insert(0)
+        self.tree.insert(-1)
+        self.tree.insert(1)
+        self.tree.insert(2)
+        self.assertFalse(self.tree.root.is_red, "_case1 failure, root not black")
+        self.assertFalse(self.tree.root.left.is_red, "_case1 failure, root's left child should be black")
+        self.assertFalse(self.tree.root.right.is_red, "_case1 failure, root's right child should be black")
+        self.assertTrue(self.tree.root.right.right.is_red, "_case1 failure last inserted node should be red")
 
     def test_case2(self):
 
