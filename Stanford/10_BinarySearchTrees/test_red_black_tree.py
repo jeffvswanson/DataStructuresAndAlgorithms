@@ -113,23 +113,30 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
         got = self.tree.root
         want = 1
         self.assertEqual(got.key, want, "_left_rotation failed, root incorrect")
-        # Test for new_parent with non-empty left subtree
-        # Test for original node as root
-        # Test for original node as non-root and a left child
-        # Test for original node as non-root and a right child
-        pass
+        self.assertFalse(got.is_red, "_left_rotation failed to recolor root to black")
+        self.assertTrue(got.right.is_red, "_left_rotation failed, right child not red")
+        self.assertTrue(got.left.is_red, "_left_rotation failed, left child not red")
 
     def test_right_rotation(self):
 
-        # Test for new_parent with empty right subtree
-        # Test for new_parent with non-empty right subtree
-        # Test for original node as root
-        # Test for original node as non-root and a left child
-        # Test for original node as non-root and a right child
-        pass
+        # Test for right rotation by inserting two values less than root node
+        self.tree.insert(0)
+        self.tree.insert(-1)
+        self.tree.insert(-2)
+        got = self.tree.root
+        want = -1
+        self.assertEqual(got.key, want, "_right_rotation failed, root incorrect")
+        self.assertFalse(got.is_red, "_right_rotation failed to recolor root to black")
+        self.assertTrue(got.right.is_red, "_right rotation failed, right child not red")
+        self.assertTrue(got.left.is_red, "_right_rotation failed, left child not red")
 
     def test_rebalance(self):
-        pass
+        
+        # Test that node is not root and node's parent is black
+        # self.tree.insert(0)
+        # self.tree.insert(-1)
+        # got = self.tree.root.left
+        # want = stn.Node()
 
     def test_insert(self):
 

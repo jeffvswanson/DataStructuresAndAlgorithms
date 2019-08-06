@@ -113,7 +113,7 @@ class RedBlackTree:
                 self._case2(node)
 
             # Do not continue, the root does not have a grandparent.
-            if node.parent == self.root:
+            if grandparent == self.root:
                 break
             else:
                 node = node.parent
@@ -152,15 +152,29 @@ class RedBlackTree:
             node: The node originating the second case of node reorganization.
         """
 
+        grandparent = node.parent.parent
         # Figure out which way to rotate.
-        if node == node.parent.right:
-            self._left_rotation(node.parent)
+        if node.parent == grandparent.right:
+            if node == node.parent.right:
+                self._left_rotation(grandparent)
+                node.parent.recolor()
+                node.parent.left.recolor()
+            else:
+                self._right_rotation(node.parent)
+                self._case2(node.right)
         else:
-            self._right_rotation(node.parent)
+            if node == node.parent.left:
+                self._right_rotation(grandparent)
+                node.parent.recolor()
+                node.parent.right.recolor()
+            else:
+                self._left_rotation(node.parent)
+                self._case2(node.left)
         
         # Recolor node and the new parent of node after rotation.
-        node.recolor()
-        node.parent.recolor()        
+        # node.recolor()
+        # node.parent.recolor()
+        # grandparent.recolor()
 
     def _left_rotation(self, node):
         """
@@ -312,7 +326,7 @@ class RedBlackTree:
 
         # Case 3: node is black
         if not node.is_red:
-            self.case3(node)
+            self._case3(node)
         
         node.delete()
 
