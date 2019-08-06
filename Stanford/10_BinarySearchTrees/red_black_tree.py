@@ -380,7 +380,7 @@ class RedBlackTree:
                     s.parent.recolor() # s.parent is black
                 self._left_rotation(s.parent)
 
-    def traverse(self, node=None) -> list:
+    def traverse(self, node) -> list:
         """
         Provides keys in increasing order.
 
@@ -390,9 +390,6 @@ class RedBlackTree:
         Returns:
             list: A list of the tree's keys in ascending order.
         """
-
-        if node == None:
-            node = self.root
         
         tree = []
         if node != None:

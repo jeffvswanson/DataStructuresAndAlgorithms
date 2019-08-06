@@ -193,15 +193,51 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
 
     def test_case2(self):
 
-        # Test to ensure rotations occur and colors are changes, not
+        # Test to ensure rotations occur and colors are changed, not
         # worried about red-black maintenance.
         pass
 
     def test_traverse(self):
 
         # Test default with root node traversal.
-        # Test a subtree traversal, that is, not starting at root node.
-        pass
+        self.tree.insert(-10)
+        got = self.tree.traverse(self.tree.root)
+        want = [-10]
+        self.assertEqual(got, want, "traverse of one element tree failed")
+
+        # Test traversal of root and one left node.
+        self.tree.insert(-20)
+        got = self.tree.traverse(self.tree.root)
+        want = [-20, -10]
+        self.assertEqual(got, want, "traverse of tree with root greater than child failed")
+
+        # Test traversal of root and one right node.
+        self.tree = rb.RedBlackTree()
+        self.tree.insert(-10)
+        self.tree.insert(0)
+        got = self.tree.traverse(self.tree.root)
+        want = [-10, 0]
+        self.assertEqual(got, want, "traverse of tree with child greater than root failed")
+
+        # Test traversal of tree with root and two children.
+        self.tree.insert(-20)
+        got = self.tree.traverse(self.tree.root)
+        want = [-20, -10, 0]
+        self.assertEqual(got, want, "traverse of tree with two children failed")
+
+        # Test traversal of tree with multiple nodes.
+        self.tree.insert(-5)
+        self.tree.insert(5)
+        self.tree.insert(10)
+        got = self.tree.traverse(self.tree.root)
+        want = [-20, -10, -5, 0, 5, 10]
+        self.assertEqual(got, want, "traverse of tree with multiple nodes failed")
+
+        # Test traversal of tree with multiple instances of a node.
+        self.tree.insert(0)
+        got = self.tree.traverse(self.tree.root)
+        want = [-20, -10, -5, 0, 5, 10]
+        self.assertEqual(got, want, "traverse of tree with multiple nodes failed")
 
     def test_successor(self):
 
