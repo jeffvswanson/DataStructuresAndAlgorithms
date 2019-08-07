@@ -285,11 +285,43 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
 
         # Test case 2 deletion: node is black, node has only one child, 
         # and the child is red.
-        # Insert the red child.
+        # Delete the root with only one node.
         self.tree.insert(-1)
         self.tree.delete(0)
         want = -1
         self.assertEqual(self.tree.root.key, want, "root not deleted")
+        self.assertFalse(self.tree.root.is_red, "new root not recolored after delete")
+        self.assertEqual(self.tree.root.left, None, "left pointer not adjusted after delete")
+        self.assertEqual(self.tree.root.right, None, "right pointer not adjusted after delete")
+
+        # Delete a node that is not the root with only a red right child.
+        self.tree.insert(-2)
+        self.tree.insert(1)
+        self.tree.insert(2)
+        self.tree.delete(1)
+
+        got = self.tree.root.right
+        want = rbn.Node(2)
+        want.recolor() # want is now red
+        want.parent = self.tree.root
+        self.assertEqual(got.key, want.key, "node not deleted properly")
+        self.assertEqual(got.parent, want.parent, "node not given proper parent after delete ran")
+        self.assertEqual(got.right, None, "got node should not have a child")
+        self.assertEqual(got.left, None, "got node should not have a child")
+        self.assertFalse(got.is_red, "node not correct color after deletion rebalancing")
+
+        # Delete a node that is not the root with only a red left child.
+        self.tree.insert(0)
+        self.tree.delete(2)
+        got = self.tree.root.right
+        want = rbn.Node(0)
+        want.recolor() # want is now red
+        want.parent = self.tree.root
+        self.assertEqual(got.key, want.key, "node not deleted properly")
+        self.assertEqual(got.parent, want.parent, "node not given proper parent after delete ran")
+        self.assertEqual(got.right, None, "got node should not have a child")
+        self.assertEqual(got.left, None, "got node should not have a child")
+        self.assertFalse(got.is_red, "node not correct color after deletion rebalancing")
 
         # Test case 3 deletion: node is black.
         # Test case 3.1: node's sibling is red.

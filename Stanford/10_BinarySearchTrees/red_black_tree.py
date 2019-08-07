@@ -299,31 +299,41 @@ class RedBlackTree:
         if node == None:
             return
         
-        # Case 1: node is red with no children
+        # Case 1: node being deleted is red with no children
         if node.is_red and node.left == None and node.right == None:
             if parent.left == node:
                 parent.left = None
             else:
                 parent.right = None
-
         # Case 2: node is black, node has only one child, and the child is red
         # As a side note, there is no case for a node possessing only one 
         # black child as that would not be a valid tree structure.
-        if node.left != None and node.left.is_red and node.right == None:
-            if parent.left == node:
+        elif node.left != None and node.left.is_red and node.right == None:
+            if parent == None:
+                self.root = node.left
+                self.root.parent == None
+                self.root.recolor()
+            elif parent.left == node:
                 parent.left = node.left
+                node.left.parent = parent
                 parent.left.recolor()
             else:
                 parent.right = node.left
+                node.left.parent = parent
                 parent.right.recolor()
         elif node.right != None and node.right.is_red and node.left == None:
+            if parent == None:
+                self.root = node.right
+                self.root.parent == None
+                self.root.recolor()
             if parent.right == node:
                 parent.right = node.right
+                node.right.parent = parent
                 parent.right.recolor()
             else:
                 parent.left = node.right
-                parent.right.recolor()
-
+                node.right.parent = parent
+                parent.left.recolor()
         # Case 3: node is black
         else:
             self._case3(node)
