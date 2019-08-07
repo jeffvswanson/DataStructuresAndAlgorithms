@@ -325,7 +325,7 @@ class RedBlackTree:
                 parent.right.recolor()
 
         # Case 3: node is black
-        if not node.is_red:
+        else:
             self._case3(node)
         
         node.delete()
@@ -490,7 +490,10 @@ class RedBlackTree:
             if v < current_node.key:
                 current_node = current_node.left
             else:
-                current_node = current_node.right   
+                current_node = current_node.right
+
+        if current_node == self.root:
+            parent = None
 
         return current_node, parent
    

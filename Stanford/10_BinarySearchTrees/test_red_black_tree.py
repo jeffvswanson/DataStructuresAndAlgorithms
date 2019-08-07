@@ -17,8 +17,8 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
         # Test for match.
         self.tree.root = rbn.Node(0)
         got = self.tree.contains(search_value.key)
-        want = (search_value.key, search_value.key)
-        self.assertTupleEqual((got[0].key, got[1].key), want)
+        want = (search_value.key, None)
+        self.assertTupleEqual((got[0].key, got[1]), want)
 
         # Test for value less than comparison node, also tests no match.
         self.tree.root = rbn.Node(1)
@@ -256,16 +256,48 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
     def test_delete_instance(self):
 
         # Test no nodes in tree.
+        got = self.tree.delete_instance(None)
+        want = None
+        self.assertEqual(got, want, "None value should be returned with no nodes in tree")
+
         # Test removing one instance.
+        # self.tree.insert(0)
+        # got = self.tree.delete_instance(0)
+        # want = None
+        # self.assertEqual(got, want, "None value should be returned when all instances of node deleted")
+
         # Test removing a second instance.
         # Test removing a node so the instances go to 0.
-        pass
 
     def test_delete(self):
 
         # Test no nodes in tree.
-        # Test removing a node for each case.
-        pass
+        got = self.tree.delete(None)
+        want = None
+        self.assertEqual(got, want, "None value should be returned with no nodes in tree")
+
+        # Test case 1 deletion: node is red with no children.
+        self.tree.insert(0)
+        # Insert the red node.
+        self.tree.insert(1)
+        self.tree.delete(1)
+        self.assertEqual(self.tree.root.right, None, "red node not deleted")
+
+        # Test case 2 deletion: node is black, node has only one child, 
+        # and the child is red.
+        # Insert the red child.
+        self.tree.insert(-1)
+        self.tree.delete(0)
+        want = -1
+        self.assertEqual(self.tree.root.key, want, "root not deleted")
+
+        # Test case 3 deletion: node is black.
+        # Test case 3.1: node's sibling is red.
+        # Test case 3.2: node's sibling, s, is black and both children
+        # of s are black.
+        # Test case 3.3: node's sibling, s, is black and s's left child is red.
+        # Test case 3.4: node's sibling, s, is black and s's right child is red. 
+        
 
 if __name__ == "__main__":
     unittest.main()
