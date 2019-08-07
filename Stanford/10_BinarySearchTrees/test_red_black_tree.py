@@ -178,6 +178,19 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
         want = 2
         self.assertEqual(self.tree.root.right.instances, want, "inserting a duplicate value failed")
 
+        # Test insert multiple values.
+        self.tree = rb.RedBlackTree()
+        self.tree.insert(10)
+        self.tree.insert(0)
+        self.tree.insert(20)
+        self.tree.insert(-10)
+        self.tree.insert(-9)
+        self.tree.insert(-20)
+        self.tree.insert(-30)
+        self.tree.insert(19)
+        self.tree.insert(30)
+        self.tree.insert(18)
+
     def test_case1(self):
 
         # Test to ensure colors get changed, not worried about red-black.
@@ -325,6 +338,16 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
 
         # Test case 3 deletion: node is black.
         # Test case 3.1: node's sibling is red.
+        # self.tree = rb.RedBlackTree()
+        # self.tree.insert(10)
+        # self.tree.insert(0)
+        # self.tree.insert(20)
+        # self.tree.insert(-10)
+        # self.tree.insert(-9)
+        # self.tree.insert(-20)
+        # self.tree.insert(-30)
+        # self.assertTrue(self.tree.root.right.is_red)
+        # self.assertFalse(self.tree.root.left.is_red)
         # Test case 3.2: node's sibling, s, is black and both children
         # of s are black.
         # Test case 3.3: node's sibling, s, is black and s's left child is red.

@@ -112,11 +112,13 @@ class RedBlackTree:
             else:
                 self._case2(node)
 
+            # Have to reassign grandparent to to rebalancing
+            grandparent = node.parent.parent
             # Do not continue, the root does not have a grandparent.
-            if grandparent == self.root:
+            if grandparent == self.root or grandparent == None:
                 break
             else:
-                node = node.parent
+               node = node.parent
         
         # After propagating ensure the root of the tree remains black.
         if self.root.is_red:
@@ -170,11 +172,6 @@ class RedBlackTree:
             else:
                 self._left_rotation(node.parent)
                 self._case2(node.left)
-        
-        # Recolor node and the new parent of node after rotation.
-        # node.recolor()
-        # node.parent.recolor()
-        # grandparent.recolor()
 
     def _left_rotation(self, node):
         """
@@ -355,7 +352,7 @@ class RedBlackTree:
         parent = node.parent
 
         if parent.right == node:
-                s = parent.left
+            s = parent.left
         else: 
             s = parent.right
         # Case 3.1: node's sibling, s, is red
@@ -365,7 +362,8 @@ class RedBlackTree:
             if s == parent.left:
                 self._right_rotation(parent)
             else:
-                self._left_rotation(parent)         
+                self._left_rotation(parent)
+            self._case3(node)
         else: # node's sibling, s, is black
             # Case 3.2: Both children of s are black
             if not (s.left.is_red and s.right.is_red):
