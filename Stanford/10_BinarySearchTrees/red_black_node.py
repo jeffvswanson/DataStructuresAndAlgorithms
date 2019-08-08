@@ -65,4 +65,4 @@ class Node:
         self.parent = None
         self.left = None
         self.right = None
-        self.is_red = True
+        self.is_red = False # Null nodes are, by default, black.

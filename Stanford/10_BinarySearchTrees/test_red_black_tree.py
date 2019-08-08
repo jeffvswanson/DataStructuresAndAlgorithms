@@ -294,7 +294,10 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
         # Insert the red node.
         self.tree.insert(1)
         self.tree.delete(1)
-        self.assertEqual(self.tree.root.right, None, "red node not deleted")
+        got = self.tree.contains(1)
+        want = None
+        self.assertEqual(got[0], want, "case 1 delete not successful")
+        self.assertEqual(self.tree.root.right, None, "case 1 node not deleted")
 
         # Test case 2 deletion: node is black, node has only one child, 
         # and the child is red.
@@ -353,12 +356,31 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
         r.left.recolor() # r.left is now black
 
         self.tree.delete(-10)
-        got = self.tree.contains(10)
+        got = self.tree.contains(-10)
+        if got[0] != None:
+            gotstring = f"node not deleted using case 3.1, got {got[0].key}"
+        else:
+            gotstring = ""
         want = None
-        self.assertEqual(got[1], want, "node not deleted using case 3.1")
+        self.assertEqual(got[0], want, gotstring)
 
         # Test case 3.2: node's sibling, s, is black and both children
         # of s are black.
+        self.tree = rb.RedBlackTree()
+        self.tree.insert(0)
+        self.tree.insert(-10)
+        self.tree.insert(10)
+        self.tree.insert(9)
+        self.tree.insert(11)
+        # Force the tree into the configuration we want.
+        # Not a valid tree, but useful for testing purposes.
+        self.tree.root.right.recolor() # 10 node is now black
+
+        # self.tree.delete(-1)
+        # got = self.tree.contains(-10)
+        # want = None
+        # self.assertEqual(got[1], want, "node not deleted using case 3.2")
+
         # Test case 3.3: node's sibling, s, is black and s's left child is red.
         # Test case 3.4: node's sibling, s, is black and s's right child is red. 
         

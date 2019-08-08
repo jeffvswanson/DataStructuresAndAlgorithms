@@ -334,6 +334,10 @@ class RedBlackTree:
         # Case 3: node is black
         else:
             self._case3(node)
+            if parent.left == node:
+                parent.left = None
+            elif parent.right == node:
+                parent.right = None
         
         node.delete()
 
