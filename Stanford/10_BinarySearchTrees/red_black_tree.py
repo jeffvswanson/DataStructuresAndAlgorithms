@@ -366,7 +366,7 @@ class RedBlackTree:
             self._case3(node)
         else: # node's sibling, s, is black
             # Case 3.2: Both children of s are black
-            if not (s.left.is_red and s.right.is_red):
+            if not ((s.left != None and s.left.is_red) and (s.right != None and s.right.is_red)):
                 s.recolor()
                 if parent.is_red:
                     parent.recolor()
