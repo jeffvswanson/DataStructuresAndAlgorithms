@@ -386,7 +386,7 @@ class RedBlackTree:
                 self._right_rotation(s) # sets us up for case 3.4
 
             # Case 3.4: s's right child is red
-            elif s.right.is_red:
+            if s.right.is_red:
                 s.right.recolor() # s.right is black
                 if parent.is_red:
                     s.parent.recolor() # s.parent is black
