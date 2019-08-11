@@ -254,10 +254,27 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
 
     def test_successor(self):
 
+        self.tree.insert(0)
+        self.tree.insert(-10)
+        self.tree.insert(10)
+        self.tree.insert(-20)
+        self.tree.insert(-5)
+        self.tree.insert(-30)
+
         # Test easy case.
+        got = self.tree.successor(-10)
+        want = -5
+        self.assertEqual(got.key, want, "successor did not return correct value on easy case")
+
         # Test other case.
+        got = self.tree.successor(-5)
+        want = 0
+        self.assertEqual(got.key, want, "successor did not return correct value on search up tree")
+
         # Test key not in search tree.
-        pass
+        got = self.tree.successor(10)
+        want = None
+        self.assertEqual(got, want, "successor did not return None when there is no value greater than the given node")
 
     def test_predecessor(self):
 

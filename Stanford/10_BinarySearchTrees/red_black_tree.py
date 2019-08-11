@@ -422,13 +422,23 @@ class RedBlackTree:
 
         # Easy Case: If the key in question's right subtree is not empty, 
         # return the min key in the right subtree.
+        key_node = self.contains(key)[0]
+        if key_node != None and key_node.right != None:
+            return self.min(key_node.right)
 
         # Otherwise, Follow parent pointers of the key in question until you
         # get to a key value greater than the original key. If you reach the 
         # root and have not found a key greater than the original key, then
         # there is no successor in the search tree and the original key is 
         # the maximum key.
-        pass
+        succ = key_node
+        while succ.parent != None:
+            if succ.parent == self.root and self.root.key < key_node.key:
+                return None
+            elif succ.parent.key > key_node.key:
+                return succ.parent
+            succ = succ.parent
+        
 
     def predecessor(self, key) -> rbn.Node:
         """
@@ -465,7 +475,7 @@ class RedBlackTree:
 
         return max_node
 
-    def min(self) -> rbn.Node:
+    def min(self, min_node=None) -> rbn.Node:
         """
         Computes the minimum value in the search tree.
 
@@ -473,7 +483,12 @@ class RedBlackTree:
             node.key: The minimum node's value.
         """
 
-        min_node = self.root
+        # Working with predecessor, have the min function take as default a None node parameter
+        # If the node is none assign it as the root in the min
+        # Then we can do a min search from the node or continue on
+
+        if min_node == None:
+            min_node = self.root
 
         
         while min_node != None and min_node.left != None:
