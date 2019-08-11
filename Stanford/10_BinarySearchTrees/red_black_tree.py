@@ -12,8 +12,16 @@ class RedBlackTree:
 
 
     Methods:
-        insert(key: key)
+        insert(key)
             Inserts an element into the search tree.
+        _rebalance(node)
+            Rebalances the red-black search tree after a node is inserted.
+        _case1(node)
+            A helper function for rebalancing a specific case where the parent
+            of the node and the node's sibling are red.
+        _case2(node)
+            A helper function for rebalancing a specific case where the parent
+            of the node is red and the node's sibling is black or None.
         _left_rotation(key)
             Reorganizes a section of the search tree so the parent node, x, 
             becomes the left child of it's original right child, y, and y 
@@ -22,25 +30,32 @@ class RedBlackTree:
             Reorganizes a section of the search tree so the parent node, x,
             becomes the right child of its original left child, y, and y
             becomes the parent of x.
-        recolor(key)
-            Recolors nodes starting at the key to ensure the red-black tree 
-            invariants are maintained when a change to the search tree occurs.
+        delete_instance(key)
+            Deletes an instance of the node from the search tree if the key
+            exists. That is, if the node was inserted multiple timesinto the 
+            tree it only removes one instance. If delete_instance is called
+            on a node with only one instance delete_instance will delete the
+            node from the red-black search tree.
         delete(key)
             Deletes a node from the search tree if the key exists.
+        _case3(node)
+            A helper function for determining how to arrange the red-black
+            tree after a node deletion. The node being deleted is black and
+            either has no children or two children.
         traverse() -> list
             Prints the keys of the search tree in ascending order, for example,
             1, 2, 3, 4, ..., n.
-        successor(key: key) -> key
+        successor(key) -> key
             Provides the given key's closest node in value that is greater than
             the key if it exists in the search tree.
-        predecessor(key: key) -> key
+        predecessor(key) -> key
             Provides the given key's closest node in value that is less than the
             key if it exists in the search tree.
         max() -> key
             Provides the maximum value that exists in the search tree.
         min() -> key
             Provides the minimum vlaue that exists in the search tree.
-        contains(key) -> Tuple[key, bool]
+        contains(key) -> Tuple[node, node]
             Checks if a value exists in the search tree.
     """
 
