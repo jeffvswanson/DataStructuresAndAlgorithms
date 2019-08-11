@@ -305,18 +305,26 @@ class TestRedBlackBinarySearchTree(unittest.TestCase):
     def test_delete_instance(self):
 
         # Test no nodes in tree.
-        got = self.tree.delete_instance(None)
+        self.tree.delete_instance(None)
+        got = self.tree.contains(None)
         want = None
-        self.assertEqual(got, want, "None value should be returned with no nodes in tree")
+        self.assertEqual(got[0], want, "None value should be returned with no nodes in tree")
 
         # Test removing one instance.
-        # self.tree.insert(0)
-        # got = self.tree.delete_instance(0)
-        # want = None
-        # self.assertEqual(got, want, "None value should be returned when all instances of node deleted")
+        self.tree.insert(0)
+        self.tree.delete_instance(0)
+        got = self.tree.contains(0)
+        want = None
+        self.assertEqual(got[0], want, "None value should be returned when all instances of node deleted")
+        self.assertEqual(self.tree.root, None, "root not None after all nodes deleted from tree")
 
         # Test removing a second instance.
-        # Test removing a node so the instances go to 0.
+        self.tree.insert(1)
+        self.tree.insert(1)
+        self.tree.delete_instance(1)
+        got = self.tree.contains(1)
+        want = 1
+        self.assertEqual(got[0].instances, want, "wrong number of instances after delete_instance")
 
     def test_delete(self):
 

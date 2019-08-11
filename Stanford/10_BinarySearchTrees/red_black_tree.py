@@ -281,6 +281,8 @@ class RedBlackTree:
             node.remove_instance()
             if node.instances < 1:
                 self.delete(key)
+                if node == self.root:
+                    self.root = None
 
     def delete(self, key):
         """
@@ -334,10 +336,11 @@ class RedBlackTree:
         # Case 3: node is black
         else:
             self._case3(node)
-            if parent.left == node:
-                parent.left = None
-            elif parent.right == node:
-                parent.right = None
+            if parent != None:
+                if parent.left == node:
+                    parent.left = None
+                elif parent.right == node:
+                    parent.right = None
         
         node.delete()
 
@@ -352,6 +355,10 @@ class RedBlackTree:
         Parameters:
             node: The node originating the case 3 deletion.
         """
+
+        # node is the root and does not need case 3.
+        if node.parent == None:
+            return
 
         parent = node.parent
 
@@ -523,7 +530,7 @@ class RedBlackTree:
 
         while current_node != None and v != current_node.key:
             parent = current_node
-            if v < current_node.key:
+            if current_node.key != None and v < current_node.key:
                 current_node = current_node.left
             else:
                 current_node = current_node.right
