@@ -7,11 +7,11 @@
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
-public class UF {
+public class UnionFind {
     private int[] id;  // access to component id (site indexed)
     private int count; // number of components
 
-    public UF(int N) {
+    public UnionFind(int N) {
         // Initialize component id array.
         count = N;
         id = new int[N];
@@ -53,7 +53,7 @@ public class UF {
     public static void main(String[] args) {
         // Solve dynamic connectivity problem on StdIn.
         int N = StdIn.readInt();  // Read number of sites.
-        UF uf = new UF(N);  // Initialize N components.
+        UnionFind uf = new UnionFind(N);  // Initialize N components.
         while (!StdIn.isEmpty()) {
             int p = StdIn.readInt();
             int q = StdIn.readInt(); // Read pair to connect.
